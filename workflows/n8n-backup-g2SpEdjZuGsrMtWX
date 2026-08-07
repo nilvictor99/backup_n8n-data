@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-07T17:45:09.084Z",
+  "updatedAt": "2026-08-07T17:50:51.034Z",
   "createdAt": "2026-08-06T17:25:42.226Z",
   "id": "g2SpEdjZuGsrMtWX",
   "name": "n8n-backup",
@@ -166,8 +166,8 @@
           "value": "={{ $('Establecer campos').item.json['Repository Name'] }}",
           "mode": "name"
         },
-        "filePath": "=workflows/",
-        "fileContent": "=",
+        "filePath": "={{ $('Preparar Nombre de Archivo (usa ID, no nombre)').item.json.filePath }}",
+        "fileContent": "={{ $('Preparar Nombre de Archivo (usa ID, no nombre)').item.json.fileContent }}",
         "commitMessage": "=Update workflow backup: {{ $json.name }} ({{ $('Establecer campos').item.json.commitDate }})"
       },
       "id": "886f77bd-d366-4ba5-b168-1b1c4ad1466d",
@@ -201,7 +201,7 @@
         },
         "filePath": "={{ $('Preparar Nombre de Archivo (usa ID, no nombre)').item.json.filePath }}",
         "fileContent": "={{ $('Preparar Nombre de Archivo (usa ID, no nombre)').item.json.fileContent }}",
-        "commitMessage": "={{ $('Preparar Nombre de Archivo (usa ID, no nombre)').item.json.workflowId }}"
+        "commitMessage": "=Create workflow backup: {{ $('Preparar Nombre de Archivo (usa ID, no nombre)').item.json.name }} ({{ $('Establecer campos').item.json.commitDate }})"
       },
       "id": "ad878763-c97c-4838-b65d-2fff52eb2135",
       "name": "crear",
@@ -505,7 +505,7 @@
   },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "c198fcae-18a1-4a89-9260-4e64635bf186",
+  "versionId": "1b39b3c4-2831-400f-abbb-2d230e4473e7",
   "activeVersionId": null,
   "triggerCount": 0,
   "shared": [
