@@ -1,0 +1,335 @@
+{
+  "updatedAt": "2026-08-08T23:54:47.522Z",
+  "createdAt": "2026-08-08T21:54:27.373Z",
+  "id": "dFknS0QFypCQkFe3",
+  "name": "ERROR-Rename-Aware",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -912,
+        80
+      ],
+      "id": "ba5aed4c-7171-482c-a185-2f59a7f6957c",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "id": "dafe891b-d0df-4ca0-9e38-acd16748d61c",
+      "name": "Captura de Workflows",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        80
+      ],
+      "credentials": {
+        "n8nApi": {
+          "id": "hAtxc9klCsIR0aF4",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "66d631d7-eb47-4cef-b0ab-0c31d356f75b",
+              "name": "workflowName",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "c514b413-667e-4973-a001-d5d6e26db50a",
+              "name": "workflowId",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "264e33e4-5b05-4290-baae-f90681c0e5bb",
+              "name": "filePath",
+              "value": "=workflows/{{ $json.name }}-{{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "938c01b1-2e7f-4f45-b9d2-57acd040349b",
+              "name": "fileContent",
+              "value": "={{ JSON.stringify($json, null, 2) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -608,
+        80
+      ],
+      "id": "1f1a96db-0f1f-43f2-b78e-a63506722b80",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "nilvictor99",
+          "mode": "list",
+          "cachedResultName": "nilvictor99",
+          "cachedResultUrl": "https://github.com/nilvictor99"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "backup_n8n-data",
+          "mode": "list",
+          "cachedResultName": "backup_n8n-data",
+          "cachedResultUrl": "https://github.com/nilvictor99/backup_n8n-data"
+        },
+        "filePath": "=workflows/{{ $('Captura de Workflows').item.json.name }}-{{ $('Captura de Workflows').item.json.id }}",
+        "fileContent": "={{ $json.fileContent }}",
+        "commitMessage": "hola"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        -400,
+        80
+      ],
+      "id": "7354b919-de14-4a49-a9f0-ef612ba44bd3",
+      "name": "Create a file",
+      "webhookId": "383aaab6-15ad-42b9-a2d2-975562702fb7",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Captura de Workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Captura de Workflows": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "411ec1ed-477b-4539-83f7-a40aed5b96e4",
+  "activeVersionId": "411ec1ed-477b-4539-83f7-a40aed5b96e4",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-08T21:54:27.373Z",
+      "createdAt": "2026-08-08T21:54:27.373Z",
+      "role": "workflow:owner",
+      "workflowId": "dFknS0QFypCQkFe3",
+      "projectId": "zaQNXN7Imke7KSJ4"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-08-08T23:53:28.995Z",
+    "createdAt": "2026-08-08T23:53:27.224Z",
+    "versionId": "411ec1ed-477b-4539-83f7-a40aed5b96e4",
+    "workflowId": "dFknS0QFypCQkFe3",
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          -912,
+          80
+        ],
+        "id": "ba5aed4c-7171-482c-a185-2f59a7f6957c",
+        "name": "Error Trigger"
+      },
+      {
+        "parameters": {
+          "filters": {},
+          "requestOptions": {}
+        },
+        "id": "dafe891b-d0df-4ca0-9e38-acd16748d61c",
+        "name": "Captura de Workflows",
+        "type": "n8n-nodes-base.n8n",
+        "typeVersion": 1,
+        "position": [
+          -768,
+          80
+        ],
+        "credentials": {
+          "n8nApi": {
+            "id": "hAtxc9klCsIR0aF4",
+            "name": "n8n account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "66d631d7-eb47-4cef-b0ab-0c31d356f75b",
+                "name": "workflowName",
+                "value": "={{ $json.name }}",
+                "type": "string"
+              },
+              {
+                "id": "c514b413-667e-4973-a001-d5d6e26db50a",
+                "name": "workflowId",
+                "value": "={{ $json.id }}",
+                "type": "string"
+              },
+              {
+                "id": "264e33e4-5b05-4290-baae-f90681c0e5bb",
+                "name": "filePath",
+                "value": "=workflows/{{ $json.name }}-{{ $json.id }}",
+                "type": "string"
+              },
+              {
+                "id": "938c01b1-2e7f-4f45-b9d2-57acd040349b",
+                "name": "fileContent",
+                "value": "={{ JSON.stringify($json, null, 2) }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.5,
+        "position": [
+          -608,
+          80
+        ],
+        "id": "1f1a96db-0f1f-43f2-b78e-a63506722b80",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "resource": "file",
+          "owner": {
+            "__rl": true,
+            "value": "nilvictor99",
+            "mode": "list",
+            "cachedResultName": "nilvictor99",
+            "cachedResultUrl": "https://github.com/nilvictor99"
+          },
+          "repository": {
+            "__rl": true,
+            "value": "backup_n8n-data",
+            "mode": "list",
+            "cachedResultName": "backup_n8n-data",
+            "cachedResultUrl": "https://github.com/nilvictor99/backup_n8n-data"
+          },
+          "filePath": "=workflows/{{ $('Captura de Workflows').item.json.name }}-{{ $('Captura de Workflows').item.json.id }}",
+          "fileContent": "={{ $json.fileContent }}",
+          "commitMessage": "hola"
+        },
+        "type": "n8n-nodes-base.github",
+        "typeVersion": 1.1,
+        "position": [
+          -400,
+          80
+        ],
+        "id": "7354b919-de14-4a49-a9f0-ef612ba44bd3",
+        "name": "Create a file",
+        "webhookId": "383aaab6-15ad-42b9-a2d2-975562702fb7",
+        "credentials": {
+          "githubApi": {
+            "id": "2ROwtZAiVTnYlkOQ",
+            "name": "GitHub account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "Captura de Workflows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Captura de Workflows": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Create a file",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "jon lest",
+    "name": "Version 411ec1ed",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
