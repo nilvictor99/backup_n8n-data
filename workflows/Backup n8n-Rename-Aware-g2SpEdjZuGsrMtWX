@@ -1,1 +1,658 @@
-{"updatedAt":"2026-08-07T17:51:50.031Z","createdAt":"2026-08-04T15:49:12.862Z","id":"T95rAIvMXg7U8rvA","name":"n8n-backup","active":true,"isArchived":false,"nodes":[{"parameters":{"filters":{},"requestOptions":{}},"id":"3ba78927-3636-4c75-a363-ff846f430ae2","name":"Captura de Workflows","type":"n8n-nodes-base.n8n","typeVersion":1,"position":[2480,896],"alwaysOutputData":false,"credentials":{"n8nApi":{"id":"hAtxc9klCsIR0aF4","name":"n8n account"}}},{"parameters":{"options":{}},"type":"n8n-nodes-base.splitInBatches","typeVersion":3,"position":[2928,896],"id":"7e6eb335-7aa5-488f-97a4-79dc67b8d863","name":"Loop Over Items"},{"parameters":{},"type":"n8n-nodes-base.noOp","typeVersion":1,"position":[3152,624],"id":"17abcb1c-f739-490f-871d-8f4a01f2ae67","name":"No Operation, do nothing"},{"parameters":{"rule":{"interval":[{}]}},"type":"n8n-nodes-base.scheduleTrigger","typeVersion":1.2,"position":[1584,896],"id":"b6f2b7d6-5170-4df0-a695-990ceac3190c","name":"Nodo Programado"},{"parameters":{"resource":"file","operation":"edit","owner":{"__rl":true,"value":"={{ $('Establecer campos').item.json['Repository Owner'] }}","mode":"name"},"repository":{"__rl":true,"value":"={{ $('Establecer campos').item.json['Repository Name'] }}","mode":"name"},"filePath":"={{ $binary.data.fileName }}","binaryData":true,"commitMessage":"={{ $('Establecer campos').item.json.commitDate }}"},"id":"b3a9dd55-2f33-4af7-8ee4-45ba62b19493","name":"Actualizador de Archivos","type":"n8n-nodes-base.github","typeVersion":1,"position":[3376,896],"webhookId":"ad758c2a-4f50-4db1-a3f3-a422c67ac0a2","credentials":{"githubApi":{"id":"2ROwtZAiVTnYlkOQ","name":"GitHub account"}}},{"parameters":{"resource":"file","owner":{"__rl":true,"value":"={{ $('Establecer campos').item.json['Repository Owner'] }}","mode":"name"},"repository":{"__rl":true,"value":"={{ $('Establecer campos').item.json['Repository Name'] }}","mode":"name"},"filePath":"={{ $binary.data.fileName }}","binaryData":true,"commitMessage":"={{ $('Establecer campos').item.json.commitDate }}"},"id":"fdf4e0f0-d5ef-4d78-bd03-940d7b1f5233","name":"Uploader de Archivos","type":"n8n-nodes-base.github","typeVersion":1,"position":[3376,1088],"webhookId":"3ba252a0-adac-44b6-9376-d870f52e28bd","credentials":{"githubApi":{"id":"2ROwtZAiVTnYlkOQ","name":"GitHub account"}}},{"parameters":{"assignments":{"assignments":[{"id":"a1d52ea6-5912-4988-94c2-115ad59c1996","name":"Repository Owner","value":"nilvictor99","type":"string"},{"id":"1c15b2e1-bf09-4643-8bba-3215119d2d6b","name":"Repository Name","value":"backup_n8n-data","type":"string"},{"id":"712f49ff-8f02-4ac3-aee8-11db8ebe5843","name":"commitDate","value":"={{ (() => {\n  const now = new Date();\n  const day = String(now.getDate()).padStart(2, '0');\n  const month = String(now.getMonth() + 1).padStart(2, '0');\n  const year = now.getFullYear();\n  const hours = String(now.getHours()).padStart(2, '0');\n  const minutes = String(now.getMinutes()).padStart(2, '0');\n  return `${day}-${month}-${year}/${hours}:${minutes}`;\n})() }}","type":"string"}]},"options":{}},"type":"n8n-nodes-base.set","typeVersion":3.4,"position":[1808,896],"id":"f8f18338-c28d-4ca0-9542-1df7ee50dbba","name":"Establecer campos"},{"parameters":{"resource":"file","operation":"list","owner":{"__rl":true,"value":"={{ $json[\"Repository Owner\"] }}","mode":"name"},"repository":{"__rl":true,"value":"={{ $json['Repository Name'] }}","mode":"name"}},"type":"n8n-nodes-base.github","typeVersion":1.1,"position":[2032,896],"id":"21ff1ef9-bc97-4892-9c84-05390d7d7125","name":"Listar archivos","webhookId":"05c29369-ddf5-4cea-ad82-2360b9460243","alwaysOutputData":true,"credentials":{"githubApi":{"id":"2ROwtZAiVTnYlkOQ","name":"GitHub account"}},"onError":"continueRegularOutput"},{"parameters":{"mode":"jsonToBinary","options":{"fileName":"={{ $json.name.replace(/\\s+/g, '-').toLowerCase() }}-{{ $json.id }}.json"}},"id":"5cd12098-f3c5-4da6-be26-74a2309073d9","name":"Convertir a binario","type":"n8n-nodes-base.moveBinaryData","typeVersion":1,"position":[2704,896]},{"parameters":{"conditions":{"string":[{"value1":"={{ $node['Combinar archivos'].json.name }}","operation":"contains","value2":"={{ $binary.data.fileName }}"}]}},"id":"3141e2ab-e09f-411d-9607-0f13bd17c564","name":"Si existe","type":"n8n-nodes-base.if","typeVersion":1,"position":[3152,816]},{"parameters":{"fieldsToAggregate":{"fieldToAggregate":[{"fieldToAggregate":"name"}]},"options":{}},"type":"n8n-nodes-base.aggregate","typeVersion":1,"position":[2256,896],"id":"8b29bb2b-bb27-4bca-9897-597d6fd69eb7","name":"Combinar archivos"},{"parameters":{"content":"#  🦾Respalda tus workflows en github\n\n### Agradecimiento a: Matias Astudillo, miembro de Vibe Community VIP\n### Únete a la [comunidad exclusiva](https://www.skool.com/vibe-community-vip/about) \n\n![captura](https://subir-imagen.com/images/2025/07/28/Captura-de-pantalla-2025-07-28-171752.png)","height":512,"width":624,"color":7},"type":"n8n-nodes-base.stickyNote","typeVersion":1,"position":[2080,272],"id":"5ee3f12b-0600-4df3-b371-7f6512f9830b","name":"Sticky Note"},{"parameters":{"content":"![Logo Vibe VIP](https://subir-imagen.com/images/2025/07/25/Logo-Vibe-VIP.png)","height":176,"color":7},"type":"n8n-nodes-base.stickyNote","typeVersion":1,"position":[1792,272],"id":"ef6c0fca-0b06-4b16-b97e-1bfca2264334","name":"Sticky Note2"},{"parameters":{"content":"## 🛡️ Workflow de Respaldo Automático de Workflows en N8N\n\nEste workflow se ejecuta **diariamente a las 12:00 a.m.** y respalda todos los workflows de N8N en un repositorio de GitHub.\n\n---\n\n### ⚙️ Configuración Inicial\n\n* **Repository Owner**: tu usuario de GitHub\n* **Repository Name**: nombre del repositorio\n* **Commit Date**: fecha y hora actual (`DD-MM-YYYY/HH:SS`)\n\n---\n\n### 🔐 Autenticación\n\n**GitHub:**\n\n1. Crea un repositorio en GitHub.\n2. Ve a `Settings > Developer Settings > Tokens (classic)`.\n3. Genera un token con permisos (`write-packages`).\n4. Usa el token en las credenciales de GitHub en N8N.\n\n**N8N:**\n\n1. Ve a `Settings > API` en tu instancia.\n2. Genera un token.\n3. Usa como Base URL:\n\n   ```\n   https://TU_INSTANCIA.com/api/v1\n   ```\n---\n\n### 🔄 Flujo del Proceso\n\n1. Se listan los archivos actuales del repositorio (GitHub).\n2. Se obtienen todos los workflows desde N8N (JSON).\n3. Se convierten a binario.\n4. En un loop:\n\n   * Si el archivo existe → se actualiza.\n   * Si no existe → se sube como nuevo.\n\n---\n\n### ✅ Resultado\n\nTodos los workflows quedan respaldados en GitHub con un commit que incluye la fecha y hora.\n\n\n\n","height":1168,"width":928,"color":5},"type":"n8n-nodes-base.stickyNote","typeVersion":1,"position":[560,240],"id":"4d578124-258e-4cb6-8da6-7208fe19f43e","name":"Sticky Note1"}],"connections":{"Captura de Workflows":{"main":[[{"node":"Convertir a binario","type":"main","index":0}]]},"Loop Over Items":{"main":[[{"node":"No Operation, do nothing","type":"main","index":0}],[{"node":"Si existe","type":"main","index":0}]]},"Nodo Programado":{"main":[[{"node":"Establecer campos","type":"main","index":0}]]},"Actualizador de Archivos":{"main":[[{"node":"Loop Over Items","type":"main","index":0}]]},"Uploader de Archivos":{"main":[[{"node":"Loop Over Items","type":"main","index":0}]]},"Establecer campos":{"main":[[{"node":"Listar archivos","type":"main","index":0}]]},"Listar archivos":{"main":[[{"node":"Combinar archivos","type":"main","index":0}]]},"Convertir a binario":{"main":[[{"node":"Loop Over Items","type":"main","index":0}]]},"Si existe":{"main":[[{"node":"Actualizador de Archivos","type":"main","index":0}],[{"node":"Uploader de Archivos","type":"main","index":0}]]},"Combinar archivos":{"main":[[{"node":"Captura de Workflows","type":"main","index":0}]]}},"settings":{"executionOrder":"v1","binaryMode":"separate","availableInMCP":false},"staticData":{"node:Nodo Programado":{"recurrenceRules":[null],"recurrenceRuleSignatures":[null]}},"meta":{"templateCredsSetupCompleted":true},"nodeGroups":[],"pinData":{},"versionId":"f63555eb-b23d-447b-bfd4-a25747d2ea63","activeVersionId":"0b73e06d-9309-4491-acdf-03e2f0064b72","triggerCount":1,"shared":[{"updatedAt":"2026-08-04T15:49:12.862Z","createdAt":"2026-08-04T15:49:12.862Z","role":"workflow:owner","workflowId":"T95rAIvMXg7U8rvA","projectId":"zaQNXN7Imke7KSJ4"}],"activeVersion":{"updatedAt":"2026-08-06T17:39:43.168Z","createdAt":"2026-08-06T17:38:17.748Z","versionId":"0b73e06d-9309-4491-acdf-03e2f0064b72","workflowId":"T95rAIvMXg7U8rvA","nodes":[{"parameters":{"filters":{},"requestOptions":{}},"id":"3ba78927-3636-4c75-a363-ff846f430ae2","name":"Captura de Workflows","type":"n8n-nodes-base.n8n","typeVersion":1,"position":[2480,896],"alwaysOutputData":false,"credentials":{"n8nApi":{"id":"hAtxc9klCsIR0aF4","name":"n8n account"}}},{"parameters":{"options":{}},"type":"n8n-nodes-base.splitInBatches","typeVersion":3,"position":[2928,896],"id":"7e6eb335-7aa5-488f-97a4-79dc67b8d863","name":"Loop Over Items"},{"parameters":{},"type":"n8n-nodes-base.noOp","typeVersion":1,"position":[3152,624],"id":"17abcb1c-f739-490f-871d-8f4a01f2ae67","name":"No Operation, do nothing"},{"parameters":{"rule":{"interval":[{}]}},"type":"n8n-nodes-base.scheduleTrigger","typeVersion":1.2,"position":[1584,896],"id":"b6f2b7d6-5170-4df0-a695-990ceac3190c","name":"Nodo Programado"},{"parameters":{"resource":"file","operation":"edit","owner":{"__rl":true,"value":"={{ $('Establecer campos').item.json['Repository Owner'] }}","mode":"name"},"repository":{"__rl":true,"value":"={{ $('Establecer campos').item.json['Repository Name'] }}","mode":"name"},"filePath":"={{ $binary.data.fileName }}","binaryData":true,"commitMessage":"={{ $('Establecer campos').item.json.commitDate }}"},"id":"b3a9dd55-2f33-4af7-8ee4-45ba62b19493","name":"Actualizador de Archivos","type":"n8n-nodes-base.github","typeVersion":1,"position":[3376,896],"webhookId":"ad758c2a-4f50-4db1-a3f3-a422c67ac0a2","credentials":{"githubApi":{"id":"2ROwtZAiVTnYlkOQ","name":"GitHub account"}}},{"parameters":{"resource":"file","owner":{"__rl":true,"value":"={{ $('Establecer campos').item.json['Repository Owner'] }}","mode":"name"},"repository":{"__rl":true,"value":"={{ $('Establecer campos').item.json['Repository Name'] }}","mode":"name"},"filePath":"={{ $binary.data.fileName }}","binaryData":true,"commitMessage":"={{ $('Establecer campos').item.json.commitDate }}"},"id":"fdf4e0f0-d5ef-4d78-bd03-940d7b1f5233","name":"Uploader de Archivos","type":"n8n-nodes-base.github","typeVersion":1,"position":[3376,1088],"webhookId":"3ba252a0-adac-44b6-9376-d870f52e28bd","credentials":{"githubApi":{"id":"2ROwtZAiVTnYlkOQ","name":"GitHub account"}}},{"parameters":{"assignments":{"assignments":[{"id":"a1d52ea6-5912-4988-94c2-115ad59c1996","name":"Repository Owner","value":"nilvictor99","type":"string"},{"id":"1c15b2e1-bf09-4643-8bba-3215119d2d6b","name":"Repository Name","value":"backup_n8n-data","type":"string"},{"id":"712f49ff-8f02-4ac3-aee8-11db8ebe5843","name":"commitDate","value":"={{ (() => {\n  const now = new Date();\n  const day = String(now.getDate()).padStart(2, '0');\n  const month = String(now.getMonth() + 1).padStart(2, '0');\n  const year = now.getFullYear();\n  const hours = String(now.getHours()).padStart(2, '0');\n  const minutes = String(now.getMinutes()).padStart(2, '0');\n  return `${day}-${month}-${year}/${hours}:${minutes}`;\n})() }}","type":"string"}]},"options":{}},"type":"n8n-nodes-base.set","typeVersion":3.4,"position":[1808,896],"id":"f8f18338-c28d-4ca0-9542-1df7ee50dbba","name":"Establecer campos"},{"parameters":{"resource":"file","operation":"list","owner":{"__rl":true,"value":"={{ $json[\"Repository Owner\"] }}","mode":"name"},"repository":{"__rl":true,"value":"={{ $json['Repository Name'] }}","mode":"name"}},"type":"n8n-nodes-base.github","typeVersion":1.1,"position":[2032,896],"id":"21ff1ef9-bc97-4892-9c84-05390d7d7125","name":"Listar archivos","webhookId":"05c29369-ddf5-4cea-ad82-2360b9460243","alwaysOutputData":true,"credentials":{"githubApi":{"id":"2ROwtZAiVTnYlkOQ","name":"GitHub account"}},"onError":"continueRegularOutput"},{"parameters":{"mode":"jsonToBinary","options":{"fileName":"={{ $json.name.replace(/\\s+/g, '-').toLowerCase() }}-{{ $json.id }}.json"}},"id":"5cd12098-f3c5-4da6-be26-74a2309073d9","name":"Convertir a binario","type":"n8n-nodes-base.moveBinaryData","typeVersion":1,"position":[2704,896]},{"parameters":{"conditions":{"string":[{"value1":"={{ $node['Combinar archivos'].json.name }}","operation":"contains","value2":"={{ $binary.data.fileName }}"}]}},"id":"3141e2ab-e09f-411d-9607-0f13bd17c564","name":"Si existe","type":"n8n-nodes-base.if","typeVersion":1,"position":[3152,816]},{"parameters":{"content":"#  🦾Respalda tus workflows en github\n\n### Agradecimiento a: Matias Astudillo, miembro de Vibe Community VIP\n### Únete a la [comunidad exclusiva](https://www.skool.com/vibe-community-vip/about) \n\n![captura](https://subir-imagen.com/images/2025/07/28/Captura-de-pantalla-2025-07-28-171752.png)","height":512,"width":624,"color":7},"type":"n8n-nodes-base.stickyNote","typeVersion":1,"position":[2080,272],"id":"5ee3f12b-0600-4df3-b371-7f6512f9830b","name":"Sticky Note"},{"parameters":{"content":"## 🛡️ Workflow de Respaldo Automático de Workflows en N8N\n\nEste workflow se ejecuta **diariamente a las 12:00 a.m.** y respalda todos los workflows de N8N en un repositorio de GitHub.\n\n---\n\n### ⚙️ Configuración Inicial\n\n* **Repository Owner**: tu usuario de GitHub\n* **Repository Name**: nombre del repositorio\n* **Commit Date**: fecha y hora actual (`DD-MM-YYYY/HH:SS`)\n\n---\n\n### 🔐 Autenticación\n\n**GitHub:**\n\n1. Crea un repositorio en GitHub.\n2. Ve a `Settings > Developer Settings > Tokens (classic)`.\n3. Genera un token con permisos (`write-packages`).\n4. Usa el token en las credenciales de GitHub en N8N.\n\n**N8N:**\n\n1. Ve a `Settings > API` en tu instancia.\n2. Genera un token.\n3. Usa como Base URL:\n\n   ```\n   https://TU_INSTANCIA.com/api/v1\n   ```\n---\n\n### 🔄 Flujo del Proceso\n\n1. Se listan los archivos actuales del repositorio (GitHub).\n2. Se obtienen todos los workflows desde N8N (JSON).\n3. Se convierten a binario.\n4. En un loop:\n\n   * Si el archivo existe → se actualiza.\n   * Si no existe → se sube como nuevo.\n\n---\n\n### ✅ Resultado\n\nTodos los workflows quedan respaldados en GitHub con un commit que incluye la fecha y hora.\n\n\n\n","height":1168,"width":928,"color":5},"type":"n8n-nodes-base.stickyNote","typeVersion":1,"position":[560,240],"id":"4d578124-258e-4cb6-8da6-7208fe19f43e","name":"Sticky Note1"},{"parameters":{"content":"![Logo Vibe VIP](https://subir-imagen.com/images/2025/07/25/Logo-Vibe-VIP.png)","height":176,"color":7},"type":"n8n-nodes-base.stickyNote","typeVersion":1,"position":[1792,272],"id":"ef6c0fca-0b06-4b16-b97e-1bfca2264334","name":"Sticky Note2"},{"parameters":{"fieldsToAggregate":{"fieldToAggregate":[{"fieldToAggregate":"name"}]},"options":{}},"type":"n8n-nodes-base.aggregate","typeVersion":1,"position":[2256,896],"id":"8b29bb2b-bb27-4bca-9897-597d6fd69eb7","name":"Combinar archivos"}],"connections":{"Captura de Workflows":{"main":[[{"node":"Convertir a binario","type":"main","index":0}]]},"Loop Over Items":{"main":[[{"node":"No Operation, do nothing","type":"main","index":0}],[{"node":"Si existe","type":"main","index":0}]]},"Nodo Programado":{"main":[[{"node":"Establecer campos","type":"main","index":0}]]},"Actualizador de Archivos":{"main":[[{"node":"Loop Over Items","type":"main","index":0}]]},"Uploader de Archivos":{"main":[[{"node":"Loop Over Items","type":"main","index":0}]]},"Establecer campos":{"main":[[{"node":"Listar archivos","type":"main","index":0}]]},"Listar archivos":{"main":[[{"node":"Combinar archivos","type":"main","index":0}]]},"Convertir a binario":{"main":[[{"node":"Loop Over Items","type":"main","index":0}]]},"Si existe":{"main":[[{"node":"Actualizador de Archivos","type":"main","index":0}],[{"node":"Uploader de Archivos","type":"main","index":0}]]},"Combinar archivos":{"main":[[{"node":"Captura de Workflows","type":"main","index":0}]]}},"nodeGroups":[],"authors":"jon lest","name":"Version 0b73e06d","description":"","autosaved":true},"tags":[]}
+{
+  "updatedAt": "2026-08-08T21:54:24.822Z",
+  "createdAt": "2026-08-06T17:25:42.226Z",
+  "id": "g2SpEdjZuGsrMtWX",
+  "name": "Backup n8n-Rename-Aware",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Compara los workflows actuales de n8n contra los archivos que ya existen en GitHub,\n// usando el ID real de cada workflow para encontrar coincidencias.\n// La comparación ignora si el archivo tiene o no extensión .json, para no marcar\n// como \"rename\" algo que solo difiere en la extensión.\n\nconst workflows = items; // viene de \"Captura de Workflows2\"\nconst githubFiles = $('Get Índice1').all();\n\nfunction stripExt(name) {\n  return name.replace(/\\.json$/i, '');\n}\n\nfunction extractId(fileNameNoExt) {\n  const match = fileNameNoExt.match(/-([A-Za-z0-9]{15,25})$/);\n  if (match) return match[1];\n  return fileNameNoExt; // formato viejo: el nombre completo YA es el ID\n}\n\nconst githubMap = new Map();\nfor (const file of githubFiles) {\n  const fileName = file.json.name;\n  const nameNoExt = stripExt(fileName);\n  const id = extractId(nameNoExt);\n  githubMap.set(id, {\n    fileName,     // nombre real tal cual está en GitHub (con o sin .json)\n    nameNoExt,    // mismo nombre pero sin extensión, para comparar\n    filePath: file.json.path\n  });\n}\n\nconst commitDate = $('Establecer campos').first().json.commitDate;\nconst output = [];\n\nfor (const item of workflows) {\n  const wf = item.json;\n  const id = wf.id;\n  const currentName = wf.name;\n\n  const desiredNameNoExt = `${currentName}-${id}`; // sin extensión, como pediste\n  const newFilePath = `workflows/${desiredNameNoExt}`;\n  const newFileContent = JSON.stringify(wf, null, 2);\n\n  const existing = githubMap.get(id);\n\n  if (!existing) {\n    output.push({ json: {\n      action: 'create', id, name: currentName,\n      newFilePath, newFileContent,\n      commitMessage: `Create workflow backup: ${currentName} (${commitDate})`\n    }});\n  } else if (existing.nameNoExt !== desiredNameNoExt) {\n    output.push({ json: {\n      action: 'rename', id, name: currentName,\n      oldFilePath: existing.filePath,\n      newFilePath, newFileContent,\n      commitMessage: `Rename workflow backup: ${existing.fileName} -> ${desiredNameNoExt} (${commitDate})`\n    }});\n  } else {\n    // Solo cambiaba la extensión (o es idéntico) -> usa el path REAL existente\n    // para actualizar el mismo archivo en vez de crear uno con otra extensión.\n    output.push({ json: {\n      action: 'update', id, name: currentName,\n      newFilePath: existing.filePath,\n      newFileContent,\n      commitMessage: `Update workflow backup: ${currentName} (${commitDate})`\n    }});\n  }\n}\n\nreturn output;"
+      },
+      "id": "acd4f0c5-321d-49d6-8ed3-87783bd061e8",
+      "name": "Comparar y Preparar Acciones",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3344,
+        3456
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "rename",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "34b562fe-8e1c-4c80-aabd-935ce34b4fdb",
+      "name": "¿Es rename?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3696,
+        3344
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "delete",
+        "owner": {
+          "__rl": true,
+          "value": "nilvictor99",
+          "mode": "list",
+          "cachedResultName": "nilvictor99",
+          "cachedResultUrl": "https://github.com/nilvictor99"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "backup_n8n-data",
+          "mode": "list",
+          "cachedResultName": "backup_n8n-data",
+          "cachedResultUrl": "https://github.com/nilvictor99/backup_n8n-data"
+        },
+        "filePath": "={{ $json.oldFilePath }}",
+        "commitMessage": "={{ $json.commitMessage }}"
+      },
+      "id": "85ebc15e-e581-410a-befd-0d9b3de3f763",
+      "name": "Eliminar archivo antiguo (rename)",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        3936,
+        3280
+      ],
+      "webhookId": "81a5fa6c-806b-4fd0-8846-623c91e95c72",
+      "alwaysOutputData": true,
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos').item.json['Repository Owner'] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos').item.json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "=workflows/{{ $('Comparar y Preparar Acciones').item.json.name }}-{{ $('Comparar y Preparar Acciones').item.json.id }}",
+        "fileContent": "={{ $('Comparar y Preparar Acciones').item.json.newFileContent }}",
+        "commitMessage": "={{ $('Comparar y Preparar Acciones').item.json.commitMessage }}"
+      },
+      "id": "a0f44625-f8d1-4f46-ae32-9ae33c2135f0",
+      "name": "Crear archivo nuevo (post-rename)",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        4176,
+        3280
+      ],
+      "webhookId": "6e3e5465-c9ff-45ea-8511-0c138c8ca525",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c2",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "create",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "03652100-273d-4a41-af23-67286e617f4d",
+      "name": "¿Es creación nueva?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3696,
+        3568
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos').item.json['Repository Owner'] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos').item.json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $json.newFilePath }}",
+        "fileContent": "={{ $json.newFileContent }}",
+        "commitMessage": "={{ $json.commitMessage }}"
+      },
+      "id": "d960fe4a-652d-410f-b9ed-701a0d30a5ea",
+      "name": "Crear archivo",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        3936,
+        3504
+      ],
+      "webhookId": "9a77f169-1ea5-4fd7-8d66-735fc7bdabbd",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos').item.json['Repository Owner'] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos').item.json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $json.newFilePath }}",
+        "fileContent": "={{ $json.newFileContent }}",
+        "commitMessage": "={{ $json.commitMessage }}"
+      },
+      "id": "34e91365-3334-49f9-bb82-b9f00849d9c4",
+      "name": "Actualizar archivo",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        3936,
+        3648
+      ],
+      "webhookId": "2e9daccd-fc42-4703-b9c8-b36f1744fae4",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## CÓMO FUNCIONA LA DETECCIÓN DE RENOMBRES\n\n1. 'Get Índice' lee `index.json` del repo (id -> nombre de la corrida ANTERIOR).\n2. 'Captura de Workflows' trae el estado ACTUAL de n8n.\n3. 'Comparar y Preparar Acciones' (JS) compara por ID (nunca por nombre):\n   - ID nuevo, no estaba en el índice -> action = 'create'\n   - ID ya estaba pero el nombre cambió -> action = 'rename' (borra el archivo viejo `nombre-viejo-id.json` y crea `nombre-nuevo-id.json`)\n   - ID ya estaba y el nombre es igual -> action = 'update' (solo sobreescribe contenido)\n4. Al final se reescribe `index.json` con el estado actual, para la próxima comparación.\n\nPor qué así y no parseando los nombres de archivo de GitHub con regex: el índice ya tiene el ID limpio guardado, así que no hay que adivinar dónde termina el nombre y empieza el ID dentro del string del archivo. Es más confiable.\n\n## CONFIGURAR\nRevisa 'Establecer campos' (owner/repo) y las credenciales GitHub/n8n API.",
+        "height": 580,
+        "width": 520
+      },
+      "id": "72976149-d630-485e-8adb-b5732f1232be",
+      "name": "Notas1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        3504
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "042cb4c9-a314-4cb7-b288-dd46e958d2e2",
+      "name": "Nodo Programado2",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        2112,
+        3680
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $json['Repository Owner'] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "workflows/",
+        "asBinaryProperty": false,
+        "additionalParameters": {}
+      },
+      "id": "b1cae871-12dd-49ef-9297-567d2aa0eaef",
+      "name": "Get Índice1",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        2592,
+        3680
+      ],
+      "webhookId": "8acf05db-b46e-4dd9-bc71-a91073ec9ef0",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      },
+      "continueOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "id": "13ab95fd-7c12-46b0-bcee-8127f193f8b2",
+      "name": "Captura de Workflows2",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        2992,
+        3680
+      ],
+      "credentials": {
+        "n8nApi": {
+          "id": "hAtxc9klCsIR0aF4",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items2 = $('Captura de Workflows2').all();\nconst index = items2.map(item => ({ id: item.json.id, name: item.json.name, updatedAt: item.json.updatedAt || null }));\nreturn [{ json: { filePath: 'index.json', fileContent: JSON.stringify(index, null, 2) } }];"
+      },
+      "id": "52521b77-3802-4d3d-bbce-5db499a8c0ab",
+      "name": "Construir Índice (id -> nombre)1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3456,
+        3840
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c3",
+              "leftValue": "={{ $('Get Índice1').first().json.sha }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2a31efae-9b4e-4680-9f2c-a8314c153576",
+      "name": "¿Índice existe?1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3696,
+        3840
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos').item.json['Repository Owner'] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos').item.json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $json.filePath }}",
+        "fileContent": "={{ $json.fileContent }}",
+        "commitMessage": "=Update index.json ({{ $('Establecer campos').item.json.commitDate }})"
+      },
+      "id": "aa51580f-b750-450a-a632-02ce2b09b71d",
+      "name": "Actualizar Índice1",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        3936,
+        3776
+      ],
+      "webhookId": "576fc9c4-0329-456e-a9b5-5273ca760367",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos').item.json['Repository Owner'] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos').item.json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $json.filePath }}",
+        "fileContent": "={{ $json.fileContent }}",
+        "commitMessage": "=Create index.json ({{ $('Establecer campos').item.json.commitDate }})"
+      },
+      "id": "46468f04-c2d1-4b35-b852-1b06067bfce7",
+      "name": "Crear Índice1",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        3936,
+        3920
+      ],
+      "webhookId": "f3e8f350-90ed-433b-9a6e-47a1b9f16d79",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "name"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2800,
+        3680
+      ],
+      "id": "e918e3f2-ed80-4ca6-b54b-351762898e4d",
+      "name": "limpiar datos github1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "Repository Owner",
+              "value": "nilvictor99",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "Repository Name",
+              "value": "backup_n8n-data",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "commitDate",
+              "value": "={{ (() => {\n  const now = new Date();\n  const day = String(now.getDate()).padStart(2, '0');\n  const month = String(now.getMonth() + 1).padStart(2, '0');\n  const year = now.getFullYear();\n  const hours = String(now.getHours()).padStart(2, '0');\n  const minutes = String(now.getMinutes()).padStart(2, '0');\n  return `${day}-${month}-${year}/${hours}:${minutes}`;\n})() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "235a34ab-d5d5-4d5b-bb70-9953d93fe56a",
+      "name": "Establecer campos",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2352,
+        3680
+      ]
+    }
+  ],
+  "connections": {
+    "Comparar y Preparar Acciones": {
+      "main": [
+        [
+          {
+            "node": "¿Es rename?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Es rename?": {
+      "main": [
+        [
+          {
+            "node": "Eliminar archivo antiguo (rename)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "¿Es creación nueva?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eliminar archivo antiguo (rename)": {
+      "main": [
+        [
+          {
+            "node": "Crear archivo nuevo (post-rename)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Es creación nueva?": {
+      "main": [
+        [
+          {
+            "node": "Crear archivo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Actualizar archivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nodo Programado2": {
+      "main": [
+        [
+          {
+            "node": "Establecer campos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Índice1": {
+      "main": [
+        [
+          {
+            "node": "limpiar datos github1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Captura de Workflows2": {
+      "main": [
+        [
+          {
+            "node": "Comparar y Preparar Acciones",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Construir Índice (id -> nombre)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir Índice (id -> nombre)1": {
+      "main": [
+        [
+          {
+            "node": "¿Índice existe?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Índice existe?1": {
+      "main": [
+        [
+          {
+            "node": "Actualizar Índice1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Crear Índice1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "limpiar datos github1": {
+      "main": [
+        [
+          {
+            "node": "Captura de Workflows2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Establecer campos": {
+      "main": [
+        [
+          {
+            "node": "Get Índice1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "4a31bfaf-1df5-46cc-b213-930d943b5da9",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-06T17:25:42.226Z",
+      "createdAt": "2026-08-06T17:25:42.226Z",
+      "role": "workflow:owner",
+      "workflowId": "g2SpEdjZuGsrMtWX",
+      "projectId": "zaQNXN7Imke7KSJ4"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
