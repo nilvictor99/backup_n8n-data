@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-08T23:07:54.608Z",
+  "updatedAt": "2026-08-08T23:13:21.769Z",
   "createdAt": "2026-08-08T21:54:27.373Z",
   "id": "dFknS0QFypCQkFe3",
   "name": "n8n-backup",
@@ -144,7 +144,7 @@
           "cachedResultName": "backup_n8n-data",
           "cachedResultUrl": "https://github.com/nilvictor99/backup_n8n-data"
         },
-        "filePath": "=workflows/",
+        "filePath": "={{ $('Edit Fields').item.json.filePath }}",
         "asBinaryProperty": false,
         "additionalParameters": {}
       },
@@ -301,7 +301,7 @@
   "meta": null,
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "643f44f4-0ea3-4ad1-9c16-e38ca801dc73",
+  "versionId": "f32c83a4-7114-4eff-b9b6-468f2527c75e",
   "activeVersionId": null,
   "triggerCount": 0,
   "shared": [
