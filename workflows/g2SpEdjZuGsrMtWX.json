@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-08T18:24:39.154Z",
+  "updatedAt": "2026-08-08T18:28:04.864Z",
   "createdAt": "2026-08-06T17:25:42.226Z",
   "id": "g2SpEdjZuGsrMtWX",
   "name": "Backup a GitHub - Por ID (sin duplicados al renombrar)",
@@ -475,7 +475,7 @@
             "caseSensitive": true,
             "leftValue": "",
             "typeValidation": "strict",
-            "version": 3
+            "version": 1
           },
           "conditions": [
             {
@@ -725,7 +725,7 @@
             "caseSensitive": true,
             "leftValue": "",
             "typeValidation": "strict",
-            "version": 3
+            "version": 1
           },
           "conditions": [
             {
@@ -1083,7 +1083,7 @@
   },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "74d580bc-1944-4697-9da2-ee8052efc4f7",
+  "versionId": "a8f36b9d-62ac-4e39-a70d-7938f8fb8272",
   "activeVersionId": null,
   "triggerCount": 0,
   "shared": [
