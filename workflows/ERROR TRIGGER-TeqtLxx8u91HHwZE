@@ -1,0 +1,199 @@
+{
+  "updatedAt": "2026-08-08T16:31:33.904Z",
+  "createdAt": "2026-08-08T16:19:42.831Z",
+  "id": "TeqtLxx8u91HHwZE",
+  "name": "ERROR TRIGGER",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        32
+      ],
+      "id": "243bc84f-5f33-4638-a602-dd3fc7514551",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// N8N Function Node - Formatear error de ejecución (genérico)\nconst data = $input.all();\n\nfunction formatErrorMessage(item) {\n  const errorData = item.json;\n  const execution = errorData.execution;\n  const workflow = errorData.workflow;\n\n  // Formatear el mensaje\n  let message = '';\n\n  // Encabezado del error\n  message += `🚨 *ERROR EN AUTOMATIZACIÓN*\\n\\n`;\n\n  // Información del workflow\n  message += `📋 *Workflow:* ${workflow.name}\\n`;\n  message += `🆔 *ID:* ${workflow.id}\\n\\n`;\n\n  // Información de la ejecución\n  message += `⚡ *Ejecución:* #${execution.id}\\n`;\n  message += `🔄 *Modo:* ${execution.mode}\\n`;\n\n  // Si es un retry, mostrarlo\n  if (execution.retryOf) {\n    message += `🔁 *Reintento de:* #${execution.retryOf}\\n`;\n  }\n\n  // Último nodo ejecutado\n  message += `📍 *Último nodo:* ${execution.lastNodeExecuted}\\n\\n`;\n\n  // Mensaje de error\n  message += `❌ *Error:*\\n${execution.error.message}\\n\\n`;\n\n  // URL para revisar (opcional)\n  if (execution.url) {\n    message += `🔗 *Ver detalles:*\\n${execution.url}\\n\\n`;\n  }\n\n  // Pie del mensaje\n  message += `⏰ ${new Date().toLocaleString('es-ES')}`;\n\n  return {\n    json: {\n      mensaje: message,\n      error_summary: {\n        workflow_name: workflow.name,\n        execution_id: execution.id,\n        error_message: execution.error.message,\n        failed_node: execution.lastNodeExecuted\n      }\n    }\n  };\n}\n\n// Procesar todos los items de entrada\nreturn data.map(formatErrorMessage);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        32
+      ],
+      "id": "808c4d09-054d-4bc4-a23c-b04802f0077a",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "sendTo": "asdier123456@gmail.com",
+        "subject": "=🚨 Error en automatización - {{ $json.error_summary.workflow_name }}",
+        "message": "={{ $json.mensaje }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        32
+      ],
+      "id": "2786c516-d9aa-4a0f-920f-c5d744669af4",
+      "name": "Send a message",
+      "webhookId": "56396b8e-4b5c-4d4d-bc7a-43e0782d81bf",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YGPha9dfNEryvbJc",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "2c09d00d-8c44-440c-92ec-3a744be2521f",
+  "activeVersionId": "2c09d00d-8c44-440c-92ec-3a744be2521f",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-08T16:19:42.831Z",
+      "createdAt": "2026-08-08T16:19:42.831Z",
+      "role": "workflow:owner",
+      "workflowId": "TeqtLxx8u91HHwZE",
+      "projectId": "zaQNXN7Imke7KSJ4"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-08-08T16:33:06.141Z",
+    "createdAt": "2026-08-08T16:31:33.906Z",
+    "versionId": "2c09d00d-8c44-440c-92ec-3a744be2521f",
+    "workflowId": "TeqtLxx8u91HHwZE",
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          -144,
+          32
+        ],
+        "id": "243bc84f-5f33-4638-a602-dd3fc7514551",
+        "name": "Error Trigger"
+      },
+      {
+        "parameters": {
+          "jsCode": "// N8N Function Node - Formatear error de ejecución (genérico)\nconst data = $input.all();\n\nfunction formatErrorMessage(item) {\n  const errorData = item.json;\n  const execution = errorData.execution;\n  const workflow = errorData.workflow;\n\n  // Formatear el mensaje\n  let message = '';\n\n  // Encabezado del error\n  message += `🚨 *ERROR EN AUTOMATIZACIÓN*\\n\\n`;\n\n  // Información del workflow\n  message += `📋 *Workflow:* ${workflow.name}\\n`;\n  message += `🆔 *ID:* ${workflow.id}\\n\\n`;\n\n  // Información de la ejecución\n  message += `⚡ *Ejecución:* #${execution.id}\\n`;\n  message += `🔄 *Modo:* ${execution.mode}\\n`;\n\n  // Si es un retry, mostrarlo\n  if (execution.retryOf) {\n    message += `🔁 *Reintento de:* #${execution.retryOf}\\n`;\n  }\n\n  // Último nodo ejecutado\n  message += `📍 *Último nodo:* ${execution.lastNodeExecuted}\\n\\n`;\n\n  // Mensaje de error\n  message += `❌ *Error:*\\n${execution.error.message}\\n\\n`;\n\n  // URL para revisar (opcional)\n  if (execution.url) {\n    message += `🔗 *Ver detalles:*\\n${execution.url}\\n\\n`;\n  }\n\n  // Pie del mensaje\n  message += `⏰ ${new Date().toLocaleString('es-ES')}`;\n\n  return {\n    json: {\n      mensaje: message,\n      error_summary: {\n        workflow_name: workflow.name,\n        execution_id: execution.id,\n        error_message: execution.error.message,\n        failed_node: execution.lastNodeExecuted\n      }\n    }\n  };\n}\n\n// Procesar todos los items de entrada\nreturn data.map(formatErrorMessage);"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          32,
+          32
+        ],
+        "id": "808c4d09-054d-4bc4-a23c-b04802f0077a",
+        "name": "Code"
+      },
+      {
+        "parameters": {
+          "sendTo": "asdier123456@gmail.com",
+          "subject": "=🚨 Error en automatización - {{ $json.error_summary.workflow_name }}",
+          "message": "={{ $json.mensaje }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          240,
+          32
+        ],
+        "id": "2786c516-d9aa-4a0f-920f-c5d744669af4",
+        "name": "Send a message",
+        "webhookId": "56396b8e-4b5c-4d4d-bc7a-43e0782d81bf",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "YGPha9dfNEryvbJc",
+            "name": "Gmail account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "Code",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code": {
+        "main": [
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send a message": {
+        "main": [
+          []
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "jon lest",
+    "name": "Version 2c09d00d",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
