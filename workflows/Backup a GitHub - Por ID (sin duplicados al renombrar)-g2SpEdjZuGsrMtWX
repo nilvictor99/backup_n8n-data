@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-08T21:10:21.067Z",
+  "updatedAt": "2026-08-08T21:14:46.431Z",
   "createdAt": "2026-08-06T17:25:42.226Z",
   "id": "g2SpEdjZuGsrMtWX",
   "name": "Backup a GitHub - Por ID (sin duplicados al renombrar)",
@@ -8,7 +8,7 @@
   "nodes": [
     {
       "parameters": {
-        "jsCode": "// Compara los workflows actuales de n8n contra los archivos que ya existen en GitHub,\n// usando el ID real de cada workflow para encontrar coincidencias.\n// La comparación ignora si el archivo tiene o no extensión .json, para no marcar\n// como \"rename\" algo que solo difiere en la extensión.\n\nconst workflows = items; // viene de \"Captura de Workflows2\"\nconst githubFiles = $('Get Índice1').all();\n\nfunction stripExt(name) {\n  return name.replace(/\\.json$/i, '');\n}\n\nfunction extractId(fileNameNoExt) {\n  const match = fileNameNoExt.match(/-([A-Za-z0-9]{15,25})$/);\n  if (match) return match[1];\n  return fileNameNoExt; // formato viejo: el nombre completo YA es el ID\n}\n\nconst githubMap = new Map();\nfor (const file of githubFiles) {\n  const fileName = file.json.name;\n  const nameNoExt = stripExt(fileName);\n  const id = extractId(nameNoExt);\n  githubMap.set(id, {\n    fileName,     // nombre real tal cual está en GitHub (con o sin .json)\n    nameNoExt,    // mismo nombre pero sin extensión, para comparar\n    filePath: file.json.path\n  });\n}\n\nconst commitDate = $('Establecer campos2').first().json.commitDate;\nconst output = [];\n\nfor (const item of workflows) {\n  const wf = item.json;\n  const id = wf.id;\n  const currentName = wf.name;\n\n  const desiredNameNoExt = `${currentName}-${id}`; // sin extensión, como pediste\n  const newFilePath = `workflows/${desiredNameNoExt}`;\n  const newFileContent = JSON.stringify(wf, null, 2);\n\n  const existing = githubMap.get(id);\n\n  if (!existing) {\n    output.push({ json: {\n      action: 'create', id, name: currentName,\n      newFilePath, newFileContent,\n      commitMessage: `Create workflow backup: ${currentName} (${commitDate})`\n    }});\n  } else if (existing.nameNoExt !== desiredNameNoExt) {\n    output.push({ json: {\n      action: 'rename', id, name: currentName,\n      oldFilePath: existing.filePath,\n      newFilePath, newFileContent,\n      commitMessage: `Rename workflow backup: ${existing.fileName} -> ${desiredNameNoExt} (${commitDate})`\n    }});\n  } else {\n    // Solo cambiaba la extensión (o es idéntico) -> usa el path REAL existente\n    // para actualizar el mismo archivo en vez de crear uno con otra extensión.\n    output.push({ json: {\n      action: 'update', id, name: currentName,\n      newFilePath: existing.filePath,\n      newFileContent,\n      commitMessage: `Update workflow backup: ${currentName} (${commitDate})`\n    }});\n  }\n}\n\nreturn output;"
+        "jsCode": "// Compara los workflows actuales de n8n contra los archivos que ya existen en GitHub,\n// usando el ID real de cada workflow para encontrar coincidencias.\n// La comparación ignora si el archivo tiene o no extensión .json, para no marcar\n// como \"rename\" algo que solo difiere en la extensión.\n\nconst workflows = items; // viene de \"Captura de Workflows2\"\nconst githubFiles = $('Get Índice1').all();\n\nfunction stripExt(name) {\n  return name.replace(/\\.json$/i, '');\n}\n\nfunction extractId(fileNameNoExt) {\n  const match = fileNameNoExt.match(/-([A-Za-z0-9]{15,25})$/);\n  if (match) return match[1];\n  return fileNameNoExt; // formato viejo: el nombre completo YA es el ID\n}\n\nconst githubMap = new Map();\nfor (const file of githubFiles) {\n  const fileName = file.json.name;\n  const nameNoExt = stripExt(fileName);\n  const id = extractId(nameNoExt);\n  githubMap.set(id, {\n    fileName,     // nombre real tal cual está en GitHub (con o sin .json)\n    nameNoExt,    // mismo nombre pero sin extensión, para comparar\n    filePath: file.json.path\n  });\n}\n\nconst commitDate = $('Establecer campos').first().json.commitDate;\nconst output = [];\n\nfor (const item of workflows) {\n  const wf = item.json;\n  const id = wf.id;\n  const currentName = wf.name;\n\n  const desiredNameNoExt = `${currentName}-${id}`; // sin extensión, como pediste\n  const newFilePath = `workflows/${desiredNameNoExt}`;\n  const newFileContent = JSON.stringify(wf, null, 2);\n\n  const existing = githubMap.get(id);\n\n  if (!existing) {\n    output.push({ json: {\n      action: 'create', id, name: currentName,\n      newFilePath, newFileContent,\n      commitMessage: `Create workflow backup: ${currentName} (${commitDate})`\n    }});\n  } else if (existing.nameNoExt !== desiredNameNoExt) {\n    output.push({ json: {\n      action: 'rename', id, name: currentName,\n      oldFilePath: existing.filePath,\n      newFilePath, newFileContent,\n      commitMessage: `Rename workflow backup: ${existing.fileName} -> ${desiredNameNoExt} (${commitDate})`\n    }});\n  } else {\n    // Solo cambiaba la extensión (o es idéntico) -> usa el path REAL existente\n    // para actualizar el mismo archivo en vez de crear uno con otra extensión.\n    output.push({ json: {\n      action: 'update', id, name: currentName,\n      newFilePath: existing.filePath,\n      newFileContent,\n      commitMessage: `Update workflow backup: ${currentName} (${commitDate})`\n    }});\n  }\n}\n\nreturn output;"
       },
       "id": "acd4f0c5-321d-49d6-8ed3-87783bd061e8",
       "name": "Comparar y Preparar Acciones",
@@ -95,12 +95,12 @@
         "resource": "file",
         "owner": {
           "__rl": true,
-          "value": "={{ $('Establecer campos2').item.json['Repository Owner'] }}",
+          "value": "={{ $('Establecer campos').item.json['Repository Owner'] }}",
           "mode": "name"
         },
         "repository": {
           "__rl": true,
-          "value": "={{ $('Establecer campos2').item.json['Repository Name'] }}",
+          "value": "={{ $('Establecer campos').item.json['Repository Name'] }}",
           "mode": "name"
         },
         "filePath": "=workflows/{{ $('Comparar y Preparar Acciones').item.json.name }}-{{ $('Comparar y Preparar Acciones').item.json.id }}",
@@ -161,12 +161,12 @@
         "resource": "file",
         "owner": {
           "__rl": true,
-          "value": "={{ $('Establecer campos2').item.json['Repository Owner'] }}",
+          "value": "={{ $('Establecer campos').item.json['Repository Owner'] }}",
           "mode": "name"
         },
         "repository": {
           "__rl": true,
-          "value": "={{ $('Establecer campos2').item.json['Repository Name'] }}",
+          "value": "={{ $('Establecer campos').item.json['Repository Name'] }}",
           "mode": "name"
         },
         "filePath": "={{ $json.newFilePath }}",
@@ -195,12 +195,12 @@
         "operation": "edit",
         "owner": {
           "__rl": true,
-          "value": "={{ $('Establecer campos2').item.json['Repository Owner'] }}",
+          "value": "={{ $('Establecer campos').item.json['Repository Owner'] }}",
           "mode": "name"
         },
         "repository": {
           "__rl": true,
-          "value": "={{ $('Establecer campos2').item.json['Repository Name'] }}",
+          "value": "={{ $('Establecer campos').item.json['Repository Name'] }}",
           "mode": "name"
         },
         "filePath": "={{ $json.newFilePath }}",
@@ -252,41 +252,6 @@
       "typeVersion": 1.2,
       "position": [
         2112,
-        3680
-      ]
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "a1",
-              "name": "Repository Owner",
-              "value": "nilvictor99",
-              "type": "string"
-            },
-            {
-              "id": "a2",
-              "name": "Repository Name",
-              "value": "backup_n8n-data",
-              "type": "string"
-            },
-            {
-              "id": "a3",
-              "name": "commitDate",
-              "value": "={{ (() => {\n  const now = new Date();\n  const day = String(now.getDate()).padStart(2, '0');\n  const month = String(now.getMonth() + 1).padStart(2, '0');\n  const year = now.getFullYear();\n  const hours = String(now.getHours()).padStart(2, '0');\n  const minutes = String(now.getMinutes()).padStart(2, '0');\n  return `${day}-${month}-${year}/${hours}:${minutes}`;\n})() }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "235a34ab-d5d5-4d5b-bb70-9953d93fe56a",
-      "name": "Establecer campos2",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        2352,
         3680
       ]
     },
@@ -399,17 +364,17 @@
         "operation": "edit",
         "owner": {
           "__rl": true,
-          "value": "={{ $('Establecer campos2').item.json['Repository Owner'] }}",
+          "value": "={{ $('Establecer campos').item.json['Repository Owner'] }}",
           "mode": "name"
         },
         "repository": {
           "__rl": true,
-          "value": "={{ $('Establecer campos2').item.json['Repository Name'] }}",
+          "value": "={{ $('Establecer campos').item.json['Repository Name'] }}",
           "mode": "name"
         },
         "filePath": "={{ $json.filePath }}",
         "fileContent": "={{ $json.fileContent }}",
-        "commitMessage": "=Update index.json ({{ $('Establecer campos2').item.json.commitDate }})"
+        "commitMessage": "=Update index.json ({{ $('Establecer campos').item.json.commitDate }})"
       },
       "id": "aa51580f-b750-450a-a632-02ce2b09b71d",
       "name": "Actualizar Índice1",
@@ -432,17 +397,17 @@
         "resource": "file",
         "owner": {
           "__rl": true,
-          "value": "={{ $('Establecer campos2').item.json['Repository Owner'] }}",
+          "value": "={{ $('Establecer campos').item.json['Repository Owner'] }}",
           "mode": "name"
         },
         "repository": {
           "__rl": true,
-          "value": "={{ $('Establecer campos2').item.json['Repository Name'] }}",
+          "value": "={{ $('Establecer campos').item.json['Repository Name'] }}",
           "mode": "name"
         },
         "filePath": "={{ $json.filePath }}",
         "fileContent": "={{ $json.fileContent }}",
-        "commitMessage": "=Create index.json ({{ $('Establecer campos2').item.json.commitDate }})"
+        "commitMessage": "=Create index.json ({{ $('Establecer campos').item.json.commitDate }})"
       },
       "id": "46468f04-c2d1-4b35-b852-1b06067bfce7",
       "name": "Crear Índice1",
@@ -479,6 +444,41 @@
       ],
       "id": "e918e3f2-ed80-4ca6-b54b-351762898e4d",
       "name": "limpiar datos github1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "Repository Owner",
+              "value": "nilvictor99",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "Repository Name",
+              "value": "backup_n8n-data",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "commitDate",
+              "value": "={{ (() => {\n  const now = new Date();\n  const day = String(now.getDate()).padStart(2, '0');\n  const month = String(now.getMonth() + 1).padStart(2, '0');\n  const year = now.getFullYear();\n  const hours = String(now.getHours()).padStart(2, '0');\n  const minutes = String(now.getMinutes()).padStart(2, '0');\n  return `${day}-${month}-${year}/${hours}:${minutes}`;\n})() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "235a34ab-d5d5-4d5b-bb70-9953d93fe56a",
+      "name": "Establecer campos",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2352,
+        3680
+      ]
     }
   ],
   "connections": {
@@ -544,18 +544,7 @@
       "main": [
         [
           {
-            "node": "Establecer campos2",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Establecer campos2": {
-      "main": [
-        [
-          {
-            "node": "Get Índice1",
+            "node": "Establecer campos",
             "type": "main",
             "index": 0
           }
@@ -628,6 +617,17 @@
           }
         ]
       ]
+    },
+    "Establecer campos": {
+      "main": [
+        [
+          {
+            "node": "Get Índice1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -641,7 +641,7 @@
   },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "b45ad14d-c850-4c9f-973b-7cd64e596b09",
+  "versionId": "913482b6-d6d0-4cdc-8e14-664ee7571e6f",
   "activeVersionId": null,
   "triggerCount": 0,
   "shared": [
