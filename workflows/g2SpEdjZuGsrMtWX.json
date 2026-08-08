@@ -1,0 +1,1100 @@
+{
+  "updatedAt": "2026-08-08T18:24:39.154Z",
+  "createdAt": "2026-08-06T17:25:42.226Z",
+  "id": "g2SpEdjZuGsrMtWX",
+  "name": "Backup a GitHub - Por ID (sin duplicados al renombrar)",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "id": "e67c1944-8b18-4755-b42f-0f6047afb01c",
+      "name": "Captura de Workflows",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        1504,
+        1184
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "n8nApi": {
+          "id": "hAtxc9klCsIR0aF4",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        1184
+      ],
+      "id": "771b6abe-19dd-42ee-9af6-1b894644ed35",
+      "name": "Nodo Programado"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1d52ea6-5912-4988-94c2-115ad59c1996",
+              "name": "Repository Owner",
+              "value": "nilvictor99",
+              "type": "string"
+            },
+            {
+              "id": "1c15b2e1-bf09-4643-8bba-3215119d2d6b",
+              "name": "Repository Name",
+              "value": "backup_n8n-data",
+              "type": "string"
+            },
+            {
+              "id": "712f49ff-8f02-4ac3-aee8-11db8ebe5843",
+              "name": "commitDate",
+              "value": "={{ (() => {\n  const now = new Date();\n  const day = String(now.getDate()).padStart(2, '0');\n  const month = String(now.getMonth() + 1).padStart(2, '0');\n  const year = now.getFullYear();\n  const hours = String(now.getHours()).padStart(2, '0');\n  const minutes = String(now.getMinutes()).padStart(2, '0');\n  return `${day}-${month}-${year}/${hours}:${minutes}`;\n})() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        848,
+        1184
+      ],
+      "id": "c2df5271-5fcd-4fb4-b282-609da15ed266",
+      "name": "Establecer campos"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "list",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $json[\"Repository Owner\"] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "workflows/"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        1088,
+        1184
+      ],
+      "id": "0c72aaca-7292-4b2b-af97-76030061ecf4",
+      "name": "Listar archivos",
+      "webhookId": "05c29369-ddf5-4cea-ad82-2360b9460243",
+      "alwaysOutputData": true,
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "owner": {
+          "__rl": true,
+          "value": "nilvictor99",
+          "mode": "list",
+          "cachedResultName": "nilvictor99",
+          "cachedResultUrl": "https://github.com/nilvictor99"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "backup_n8n-data",
+          "mode": "list",
+          "cachedResultName": "backup_n8n-data",
+          "cachedResultUrl": "https://github.com/nilvictor99/backup_n8n-data"
+        },
+        "filePath": "={{ $json.filePath }}",
+        "asBinaryProperty": false,
+        "additionalParameters": {}
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        2048,
+        1184
+      ],
+      "id": "cae0ac58-cfe5-40d5-9f17-cad69259d0bb",
+      "name": "Get a file",
+      "webhookId": "690a3c51-1468-445e-8a95-cb165a52c8f0",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos').item.json['Repository Owner'] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos').item.json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $('Preparar Nombre de Archivo (usa ID, no nombre)').item.json.filePath }}",
+        "fileContent": "={{ $('Preparar Nombre de Archivo (usa ID, no nombre)').item.json.fileContent }}",
+        "commitMessage": "=Update workflow backup: {{ $json.name }} ({{ $('Establecer campos').item.json.commitDate }})"
+      },
+      "id": "886f77bd-d366-4ba5-b168-1b1c4ad1466d",
+      "name": "actualizar",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        2432,
+        1120
+      ],
+      "webhookId": "3ba252a0-adac-44b6-9376-d870f52e28bd",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos').item.json['Repository Owner'] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos').item.json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $('Preparar Nombre de Archivo (usa ID, no nombre)').item.json.filePath }}",
+        "fileContent": "={{ $('Preparar Nombre de Archivo (usa ID, no nombre)').item.json.fileContent }}",
+        "commitMessage": "=Create workflow backup: {{ $('Preparar Nombre de Archivo (usa ID, no nombre)').item.json.name }} ({{ $('Establecer campos').item.json.commitDate }})"
+      },
+      "id": "ad878763-c97c-4838-b65d-2fff52eb2135",
+      "name": "crear",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        2432,
+        1296
+      ],
+      "webhookId": "3ba252a0-adac-44b6-9376-d870f52e28bd",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let output = [];\n\nlet n8nItems = $('Preparar Nombre de Archivo (usa ID, no nombre)').all();\nlet githubNames = $('limpiar datos github').first().json.name || [];\n\n// === MAPA DE WORKFLOWS DE N8N ===\nlet n8nMap = new Map();\n\n// Formato actual: workflows/n8n-backup-g2SpEdjZuGsrMtWX\nfor (let item of n8nItems) {\n  let full = item.json.name || '';\n  let workflowId = item.json.id || '';\n\n  let name = full.replace(/^workflows\\/[^\\/]+\\//, '');\n  name = name.replace(/^n8n-backup-/, '');\n\n  n8nMap.set(workflowId, {\n    source: 'n8n',\n    full: full,\n    name: name,\n    id: workflowId\n  });\n}\n\n// === MAPA DE ARCHIVOS EN GITHUB ===\nlet githubMap = new Map();\n\nfor (let filename of githubNames) {\n  let withoutExt = filename.replace(/\\.json$/, '');\n  let parts = withoutExt.split('_');\n  if (parts.length > 0) {\n    let fullName = withoutExt;\n    let name = fullName.replace(/^n8n-backup-/, '');\n\n    githubMap.set(fullName, {\n      source: 'github',\n      full: filename,\n      name: name,\n      id: fullName\n    });\n  }\n}\n\n// === DETECTAR CAMBIOS DE NOMBRE ===\nfor (let [workflowId, n8n] of n8nMap) {\n  let gh = githubMap.get(n8n.full);   // buscamos por nombre completo del archivo\n\n  if (gh && n8n.name !== gh.name) {\n    output.push({ json: { n8n, github: gh } });\n  }\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        1456
+      ],
+      "id": "a13abba3-2301-401a-95eb-6276d5a388e1",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "name"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        1184
+      ],
+      "id": "fc87cf46-f8da-400a-91d0-29f271d751c2",
+      "name": "limpiar datos github"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "delete",
+        "owner": {
+          "__rl": true,
+          "value": "nilvictor99",
+          "mode": "list",
+          "cachedResultName": "nilvictor99",
+          "cachedResultUrl": "https://github.com/nilvictor99"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "n8n-backup",
+          "mode": "list",
+          "cachedResultName": "n8n-backup",
+          "cachedResultUrl": "https://github.com/nilvictor99/n8n-backup"
+        },
+        "filePath": "=workflows/{{ $json.github.full }}",
+        "commitMessage": "=Delete old workflow after rename: {{ $json.github.full }} → {{ $json.n8n.full }} (ID: {{ $json.n8n.id }})"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        2208,
+        1456
+      ],
+      "id": "062f261a-7d12-4e71-942c-50ff73b0595d",
+      "name": "Delete a file",
+      "webhookId": "bdfde0b2-9e16-4898-ae1c-99d4eeb8a759",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1c55dc60-c1c4-4a11-8c43-c45ed6e31404",
+              "leftValue": "={{ $json.sha }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2208,
+        1184
+      ],
+      "id": "32d1ec64-2f15-4d0d-854b-31d9d305a5c1",
+      "name": "si el archivo existe"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "asg-1",
+              "name": "filePath",
+              "value": "=workflows/{{ $json.name }}-{{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "asg-2",
+              "name": "fileContent",
+              "value": "={{JSON.stringify($json, null, 2)}}",
+              "type": "string"
+            },
+            {
+              "id": "asg-3",
+              "name": "workflowId",
+              "value": "={{$json.id}}",
+              "type": "string"
+            },
+            {
+              "id": "asg-4",
+              "name": "workflowName",
+              "value": "={{$json.name}}",
+              "type": "string"
+            },
+            {
+              "id": "3d05475b-4810-4d5e-aadd-0d3f77d46b2c",
+              "name": "name",
+              "value": "={{ $json.name }}-{{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6592e54d-2bfa-43b2-a784-d7b1a1f2ad69",
+      "name": "Preparar Nombre de Archivo (usa ID, no nombre)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1696,
+        1184
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5e484c7d-a22e-4e31-95f0-4f54c8bc3df5",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1904,
+        1184
+      ],
+      "id": "d405ba8f-2fa3-47b3-a52e-0069a25952d2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "## CÓMO FUNCIONA\n\n- Cada workflow se guarda como `workflows/{id}.json`. El ID de n8n NUNCA cambia, así que renombrar un flujo YA NO crea un archivo duplicado: 'Get a file' siempre encuentra el mismo archivo y 'actualizar' lo sobreescribe.\n- Ya no hace falta comparar dos listas ni borrar archivos viejos: por eso este flujo NO tiene nodo de código, ni 'Delete a file', ni 'Listar archivos'.\n- Rama de abajo: mantiene `index.json` en la raíz del repo con el mapeo `id -> nombre actual`, para que puedas identificar los flujos por nombre sin abrir cada archivo.\n\n## CONFIGURAR\nRevisa 'Establecer campos' (owner/repo) y las credenciales de los nodos GitHub / n8n API (ya vienen referenciadas igual que en tu flujo original).",
+        "height": 340,
+        "width": 480
+      },
+      "id": "521e711b-c1c8-468f-9569-c033b877f2e7",
+      "name": "Notas",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        464,
+        1552
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Construye un índice legible id -> nombre actual, usando TODOS los workflows traídos\nconst items = $('Captura de Workflows1').all();\n\nconst index = items.map(item => ({\n  id: item.json.id,\n  name: item.json.name,\n  updatedAt: item.json.updatedAt || null\n}));\n\nreturn [{\n  json: {\n    filePath: 'index.json',\n    fileContent: JSON.stringify(index, null, 2)\n  }\n}];"
+      },
+      "id": "8357c134-5c6b-45c5-931e-1e9c30941a3c",
+      "name": "Construir Índice (id -> nombre)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        2112
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos1').item.json['Repository Owner'] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos1').item.json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $json.filePath }}",
+        "asBinaryProperty": false,
+        "additionalParameters": {}
+      },
+      "id": "f8c5a4c4-0496-4935-9ce9-737e9ac28c38",
+      "name": "Get Índice",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        1712,
+        2112
+      ],
+      "webhookId": "7adf019b-096f-44c2-b749-0410484d8f28",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      },
+      "continueOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cond-indice-1",
+              "leftValue": "={{ $json.sha }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "dad627dc-54b8-4c41-bed5-1319f50f807e",
+      "name": "¿Índice existe?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1952,
+        2112
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos1').item.json['Repository Owner'] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos1').item.json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $('Construir Índice (id -> nombre)').item.json.filePath }}",
+        "fileContent": "={{ $('Construir Índice (id -> nombre)').item.json.fileContent }}",
+        "commitMessage": "=Update index.json ({{ $('Establecer campos1').item.json.commitDate }})"
+      },
+      "id": "c640be21-0f01-49e4-9c76-b52e9e48ec22",
+      "name": "Actualizar Índice",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        2192,
+        2080
+      ],
+      "webhookId": "352ddf83-5113-44fa-b1ec-de45c908c9c1",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos1').item.json['Repository Owner'] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos1').item.json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $('Construir Índice (id -> nombre)').item.json.filePath }}",
+        "fileContent": "={{ $('Construir Índice (id -> nombre)').item.json.fileContent }}",
+        "commitMessage": "=Create index.json ({{ $('Establecer campos1').item.json.commitDate }})"
+      },
+      "id": "9f7c819b-69f2-4ee2-a0f8-885753b95d6e",
+      "name": "Crear Índice",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        2192,
+        2240
+      ],
+      "webhookId": "30dbf8fa-44dc-4a59-9b28-ce11392683ad",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "1e49b02d-03f5-4759-b107-cb7429cbe466",
+      "name": "Nodo Programado1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        1952
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1d52ea6-5912-4988-94c2-115ad59c1996",
+              "name": "Repository Owner",
+              "value": "nilvictor99",
+              "type": "string"
+            },
+            {
+              "id": "1c15b2e1-bf09-4643-8bba-3215119d2d6b",
+              "name": "Repository Name",
+              "value": "backup_n8n-data",
+              "type": "string"
+            },
+            {
+              "id": "712f49ff-8f02-4ac3-aee8-11db8ebe5843",
+              "name": "commitDate",
+              "value": "={{ (() => {\n  const now = new Date();\n  const day = String(now.getDate()).padStart(2, '0');\n  const month = String(now.getMonth() + 1).padStart(2, '0');\n  const year = now.getFullYear();\n  const hours = String(now.getHours()).padStart(2, '0');\n  const minutes = String(now.getMinutes()).padStart(2, '0');\n  return `${day}-${month}-${year}/${hours}:${minutes}`;\n})() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "96cf8f09-38a8-44e0-9bd9-15bb895ea6fc",
+      "name": "Establecer campos1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        992,
+        1952
+      ]
+    },
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "id": "0504a7b2-b614-46d2-944c-c952ee3ad0c6",
+      "name": "Captura de Workflows1",
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        1952
+      ],
+      "credentials": {
+        "n8nApi": {
+          "id": "hAtxc9klCsIR0aF4",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "asg-1",
+              "name": "filePath",
+              "value": "=workflows/{{ $json.id }}.json",
+              "type": "string"
+            },
+            {
+              "id": "asg-2",
+              "name": "fileContent",
+              "value": "={{ JSON.stringify($json, null, 2) }}",
+              "type": "string"
+            },
+            {
+              "id": "asg-3",
+              "name": "workflowId",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "asg-4",
+              "name": "workflowName",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "50049eb8-ecb5-4642-a9f7-7e72c57299a5",
+      "name": "Preparar Nombre de Archivo (usa ID, no nombre)1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1472,
+        1856
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos1').item.json['Repository Owner'] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos1').item.json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $json.filePath }}",
+        "asBinaryProperty": false,
+        "additionalParameters": {}
+      },
+      "id": "5aca2776-a3c7-41ad-95bf-2843617eda2d",
+      "name": "Get a file1",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        1712,
+        1856
+      ],
+      "webhookId": "21acaaf2-dcf9-43a7-885f-ef55dbbc18c2",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      },
+      "continueOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1c55dc60-c1c4-4a11-8c43-c45ed6e31404",
+              "leftValue": "={{ $json.sha }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "0907289c-9166-45a1-8472-7552df3ee832",
+      "name": "si el archivo existe1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1952,
+        1856
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos1').item.json['Repository Owner'] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos1').item.json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $('Preparar Nombre de Archivo (usa ID, no nombre)1').item.json.filePath }}",
+        "fileContent": "={{ $('Preparar Nombre de Archivo (usa ID, no nombre)1').item.json.fileContent }}",
+        "commitMessage": "=Update workflow backup: {{ $('Preparar Nombre de Archivo (usa ID, no nombre)1').item.json.workflowName }} ({{ $('Establecer campos1').item.json.commitDate }})"
+      },
+      "id": "9dc7ca27-41e5-4683-af0b-dac225fef765",
+      "name": "actualizar1",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        2192,
+        1776
+      ],
+      "webhookId": "1e212b89-4a47-479f-ad4a-a35755cbe4f2",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos1').item.json['Repository Owner'] }}",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "={{ $('Establecer campos1').item.json['Repository Name'] }}",
+          "mode": "name"
+        },
+        "filePath": "={{ $('Preparar Nombre de Archivo (usa ID, no nombre)1').item.json.filePath }}",
+        "fileContent": "={{ $('Preparar Nombre de Archivo (usa ID, no nombre)1').item.json.fileContent }}",
+        "commitMessage": "=Create workflow backup: {{ $('Preparar Nombre de Archivo (usa ID, no nombre)1').item.json.workflowName }} ({{ $('Establecer campos1').item.json.commitDate }})"
+      },
+      "id": "6c375bdf-d01a-4c97-b9de-0525b498f31d",
+      "name": "crear1",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [
+        2192,
+        1952
+      ],
+      "webhookId": "7f900cec-d1f9-4839-97c0-5e526cf54616",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Captura de Workflows": {
+      "main": [
+        [
+          {
+            "node": "Preparar Nombre de Archivo (usa ID, no nombre)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nodo Programado": {
+      "main": [
+        [
+          {
+            "node": "Establecer campos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Establecer campos": {
+      "main": [
+        [
+          {
+            "node": "Listar archivos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listar archivos": {
+      "main": [
+        [
+          {
+            "node": "limpiar datos github",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "si el archivo existe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "actualizar": {
+      "main": [
+        []
+      ]
+    },
+    "crear": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Delete a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "limpiar datos github": {
+      "main": [
+        [
+          {
+            "node": "Captura de Workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "si el archivo existe": {
+      "main": [
+        [
+          {
+            "node": "actualizar",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "crear",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Nombre de Archivo (usa ID, no nombre)": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir Índice (id -> nombre)": {
+      "main": [
+        [
+          {
+            "node": "Get Índice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Índice": {
+      "main": [
+        [
+          {
+            "node": "¿Índice existe?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Índice existe?": {
+      "main": [
+        [
+          {
+            "node": "Actualizar Índice",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Crear Índice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nodo Programado1": {
+      "main": [
+        [
+          {
+            "node": "Establecer campos1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Establecer campos1": {
+      "main": [
+        [
+          {
+            "node": "Captura de Workflows1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Captura de Workflows1": {
+      "main": [
+        [
+          {
+            "node": "Preparar Nombre de Archivo (usa ID, no nombre)1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Construir Índice (id -> nombre)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Nombre de Archivo (usa ID, no nombre)1": {
+      "main": [
+        [
+          {
+            "node": "Get a file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file1": {
+      "main": [
+        [
+          {
+            "node": "si el archivo existe1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "si el archivo existe1": {
+      "main": [
+        [
+          {
+            "node": "actualizar1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "crear1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "74d580bc-1944-4697-9da2-ee8052efc4f7",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-06T17:25:42.226Z",
+      "createdAt": "2026-08-06T17:25:42.226Z",
+      "role": "workflow:owner",
+      "workflowId": "g2SpEdjZuGsrMtWX",
+      "projectId": "zaQNXN7Imke7KSJ4"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
