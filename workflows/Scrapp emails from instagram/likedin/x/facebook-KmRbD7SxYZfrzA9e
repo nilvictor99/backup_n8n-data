@@ -1,0 +1,587 @@
+{
+  "updatedAt": "2026-08-09T01:54:39.871Z",
+  "createdAt": "2026-08-09T01:54:39.871Z",
+  "id": "KmRbD7SxYZfrzA9e",
+  "name": "Scrapp emails from instagram/likedin/x/facebook",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Procesa todos los ítems y simplifica el campo \"output.queries\" a \"query\"\nfor (const item of $input.all()) {\n  // Accede al campo con nombre que contiene un punto\n  const query = item.json[\"output.queries\"] || \"\";\n\n  // Opcional: decodifica los \"+\" a espacios si necesitas texto legible\n  // const readable = query.replace(/\\+/g, ' ');\n\n  // Asigna una versión limpia y fácil de usar\n  item.json.query = query;\n  // item.json.queryReadable = readable; // descomenta si necesitas versión legible\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        416
+      ],
+      "id": "5820c15a-45f4-4cbd-80ba-b267ecc6218b",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  const query = item.json.query || \"\";\n\n  // 1. Extraer dominio (instagram.com, x.com, etc.)\n  const domainMatch = query.match(/site:([a-zA-Z0-9.-]+)/);\n  const domain = domainMatch ? domainMatch[1] : \"example.com\";\n\n  // 2. Extraer el \"tipo de negocio\" entre comillas (ej: \"laboratorio+clinico\")\n  const businessMatch = query.match(/\"([^\"]+)\"/);\n  let business = businessMatch ? businessMatch[1].replace(/\\+/g, ' ') : \"clínica\";\n\n  // 3. Generar email realista\n  const cleanBusiness = business.toLowerCase().replace(/[^a-z0-9\\s]/g, '').split(' ').join('');\n  const email = `${cleanBusiness}@${domain.split('.').slice(-2).join('.')}`; // ej: laboratorioclinico@gmail.com\n\n  // 4. Generar título y snippet\n  const pageTitle = `${business} - Contacto y Servicios`;\n  const snippet = `Encuentra información de contacto, servicios y ubicación de ${business}. Correo: ${email}.`;\n\n  // 5. Generar link de ejemplo\n  const pageLink = `https://www.${domain}/contacto`;\n\n  // Asignar los campos\n  item.json.pageTitle = pageTitle;\n  item.json.pageLink = pageLink;\n  item.json.email = email;\n  item.json.snippet = snippet;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        416
+      ],
+      "id": "645a3356-160b-40c0-9b58-8a8e3b1f159a",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1280,
+        0
+      ],
+      "id": "414ea61b-cfb4-41bc-9c92-8baf0e113d83",
+      "name": "Telegram Trigger1",
+      "webhookId": "3d8b6c48-64b5-4ec9-927b-3c3ddf2f36bc",
+      "credentials": {
+        "telegramApi": {
+          "id": "iKIJn7aQygNFPjk4",
+          "name": "Telegram-scrafbin_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -976,
+        624
+      ],
+      "id": "d43b243f-15bb-4d20-8c79-2ffa93b7c77f",
+      "name": "OpenAI Chat Model1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"{{ $json.cleanQuery }}\",\n  \"auto_parameters\": false,\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 5,\n  \"time_range\": null,\n  \"days\": 7,\n  \"include_answer\": true,\n  \"include_raw_content\": true,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_favicon\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": [],\n  \"country\": null\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        192,
+        272
+      ],
+      "id": "45c659f6-2d5e-4dd4-82a1-778b658e1eb5",
+      "name": "Resultados1",
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "eQ4VWRohZQVN70RG",
+          "name": "search-tavily"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  // Obtener el texto original (maneja caso nulo o indefinido)\n  const rawText = item.json.output || '';\n\n  // Limpiar: eliminar saltos de línea, retornos, tabs y normalizar espacios\n  const cleanText = rawText\n    .replace(/[\\r\\n\\t]+/g, ' ')   // Reemplazar \\r, \\n, \\t por espacio\n    .replace(/\\s+/g, ' ')         // Reemplazar múltiples espacios por uno solo\n    .trim();                      // Eliminar espacios al inicio y al final\n\n  // Asignar el texto limpio a un nuevo campo (puedes llamarlo como quieras)\n  item.json.cleanQuery = cleanText;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        272
+      ],
+      "id": "50b75d95-0464-42fa-8594-a9413a6aef6c",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "model": "tngtech/deepseek-r1t2-chimera:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        624
+      ],
+      "id": "b1fd9d45-991e-4aa0-a435-26101c8939ab",
+      "name": "OpenRouter Chat Model2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TZtdDTD8IX1w0r2b",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener datos de entrada\nconst items = $input.all();\n\n// Crear un array para guardar los datos extraídos\nconst extractedData = [];\n\nfor (const item of items) {\n  const results = item.json.organic_results || [];\n\n  for (const result of results) {\n    const text = result.snippet || '';\n    const title = result.title || '';\n    const link = result.link || '';\n    const emails = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/g);\n\n    if (emails) {\n      for (const email of emails) {\n        extractedData.push({\n          pageTitle: title,\n          pageLink: link,\n          snippet: text,\n          email\n        });\n      }\n    }\n  }\n}\n\n// Devolver solo los datos que contienen email\nreturn extractedData.map(data => ({ json: data }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        272
+      ],
+      "id": "9f40e813-f736-446b-9c40-b0f3bfcff7bb",
+      "name": "Extraer datos1"
+    },
+    {
+      "parameters": {
+        "url": "=https://serpapi.com/search?engine=google&q={{ $json[\"output.queries\"] }}&num=100&gl=MX&hl=es&api_key=[tu api key]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        64,
+        112
+      ],
+      "id": "8f9f516e-9057-4317-91bb-01484baed24f",
+      "name": "Obtener resultados1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        144,
+        480
+      ],
+      "id": "6cbbe668-f19b-41ab-91fa-1d787db34645",
+      "name": "Loop queries1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output.queries",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        416
+      ],
+      "id": "ce512421-b91a-4926-996c-14620092a421",
+      "name": "Separar queries1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tarea:  \nGenera una lista de {{ $json.cantidadConsultas }} cadenas de búsqueda relacionadas con este tipo de negocio: {{ $json.tipoNegocio }}.\n\nInstrucciones:\n\n1. **Formato de cada consulta**:  \n- Por cada término generado, crea 4 consultas, una para cada uno de estos sitios: `instagram.com`, `x.com`, `facebook.com`, `linkedin.com`.\n- El formato de cada consulta debe ser:  \n  `site:<DOMINIO>+\"<tipo_de_negocio_formateado>\"+\"@gmail.com\" OR \"@hotmail.com\" OR \"@outlook.com\" OR \"@yahoo.com\"`.\n- Dentro de las comillas `\"`, todos los espacios deben ser reemplazados por signos `+`.\n- Usa siempre minúsculas. No uses acentos ni caracteres especiales.\n- No traduzcas el término proporcionado en la variable `tipoNegocio`; respétalo tal como está en su idioma original.\n- Expande el término principal en variaciones relevantes en el mismo idioma, incluyendo sinónimos, servicios relacionados y especializaciones específicas del tipo de negocio.\n- Utiliza términos que estén más orientados a una búsqueda más específica y localizada. Por ejemplo, si el `tipoNegocio` es \"Dentistas\", genera consultas como: \"consultorio dental\", \"clínica dental\", \"endodoncia\", \"odontólogos\", \"higienistas dentales\", etc. No uses términos genéricos como \"dentist\" o traducciones incorrectas como \"surgery\" si el término original está en español.\n\n2. **Generación de términos**:  \n- Para cada tipo de negocio, expande el término principal usando variaciones como sinónimos, especializaciones, servicios adicionales relacionados y nombres populares locales. Las búsquedas deben ser lo más específicas posible a la industria y contexto local.\n- Evita términos demasiado generales o irreales, y enfócate en aquellos que puedan generar resultados precisos.\n- Las búsquedas deben estar orientadas a encontrar contactos de correos electrónicos en plataformas como Instagram, Facebook, LinkedIn y X, ya que se utilizarán para scrapeo con SerpApi.\n\n3. **Formato de salida**:  \n- Devuelve exclusivamente un objeto JSON válido con un nodo `\"queries\"`, que contendrá todas las cadenas de búsqueda generadas.  \n- El número total de consultas será de `{{ $json.cantidadConsultas * 4 }}`, ya que hay 4 sitios por cada búsqueda.\n\nEjemplo de salida:\n\n```json\n{\n  \"queries\": [\n    \"site:instagram.com+\\\"consultorio+dental\\\"+\\\"@gmail.com\\\"+OR+\\\"@hotmail.com\\\"+OR+\\\"@outlook.com\\\"+OR+\\\"@yahoo.com\\\"\",\n    \"site:x.com+\\\"consultorio+dental\\\"+\\\"@gmail.com\\\"+OR+\\\"@hotmail.com\\\"+OR+\\\"@outlook.com\\\"+OR+\\\"@yahoo.com\\\"\",\n    \"site:facebook.com+\\\"consultorio+dental\\\"+\\\"@gmail.com\\\"+OR+\\\"@hotmail.com\\\"+OR+\\\"@outlook.com\\\"+OR+\\\"@yahoo.com\\\"\",\n    \"site:linkedin.com+\\\"consultorio+dental\\\"+\\\"@gmail.com\\\"+OR+\\\"@hotmail.com\\\"+OR+\\\"@outlook.com\\\"+OR+\\\"@yahoo.com\\\"\",\n    \"site:instagram.com+\\\"clinica+dental\\\"+\\\"@gmail.com\\\"+OR+\\\"@hotmail.com\\\"+OR+\\\"@outlook.com\\\"+OR+\\\"@yahoo.com\\\"\",\n    \"site:x.com+\\\"clinica+dental\\\"+\\\"@gmail.com\\\"+OR+\\\"@hotmail.com\\\"+OR+\\\"@outlook.com\\\"+OR+\\\"@yahoo.com\\\"\",\n    \"site:facebook.com+\\\"clinica+dental\\\"+\\\"@gmail.com\\\"+OR+\\\"@hotmail.com\\\"+OR+\\\"@outlook.com\\\"+OR+\\\"@yahoo.com\\\"\",\n    \"site:linkedin.com+\\\"clinica+dental\\\"+\\\"@gmail.com\\\"+OR+\\\"@hotmail.com\\\"+OR+\\\"@outlook.com\\\"+OR+\\\"@yahoo.com\\\"\",\n    \"site:instagram.com+\\\"endodoncia\\\"+\\\"@gmail.com\\\"+OR+\\\"@hotmail.com\\\"+OR+\\\"@outlook.com\\\"+OR+\\\"@yahoo.com\\\"\",\n    \"site:x.com+\\\"endodoncia\\\"+\\\"@gmail.com\\\"+OR+\\\"@hotmail.com\\\"+OR+\\\"@outlook.com\\\"+OR+\\\"@yahoo.com\\\"\",\n    \"site:facebook.com+\\\"endodoncia\\\"+\\\"@gmail.com\\\"+OR+\\\"@hotmail.com\\\"+OR+\\\"@outlook.com\\\"+OR+\\\"@yahoo.com\\\"\",\n    \"site:linkedin.com+\\\"endodoncia\\\"+\\\"@gmail.com\\\"+OR+\\\"@hotmail.com\\\"+OR+\\\"@outlook.com\\\"+OR+\\\"@yahoo.com\\\"\",\n    ...\n  ]\n}\n",
+        "hasOutputParser": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -800,
+        416
+      ],
+      "id": "907838a6-20d9-4179-815c-981294bf5143",
+      "name": "Generar queries1"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "email",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        608,
+        272
+      ],
+      "id": "a438ee7b-6984-4293-bb5a-defd738e734f",
+      "name": "Remove Duplicates1"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"queries\": [\n    \"site:instagram.com+\\\"clinica+dental\\\"+\\\"@gmail.com\\\" OR \\\"@hotmail.com\\\" OR \\\"@outlook.com\\\" OR \\\"@yahoo.com\\\"\",\n    \"site:instagram.com+\\\"odontologos+profesionales\\\"+\\\"@gmail.com\\\" OR \\\"@hotmail.com\\\" OR \\\"@outlook.com\\\" OR \\\"@yahoo.com\\\"\",\n    \"site:instagram.com+\\\"consultorio+odontologico\\\"+\\\"@gmail.com\\\" OR \\\"@hotmail.com\\\" OR \\\"@outlook.com\\\" OR \\\"@yahoo.com\\\"\",\n    \"site:instagram.com+\\\"dentistas+especialistas\\\"+\\\"@gmail.com\\\" OR \\\"@hotmail.com\\\" OR \\\"@outlook.com\\\" OR \\\"@yahoo.com\\\"\",\n    \"site:instagram.com+\\\"ortodoncistas\\\"+\\\"@gmail.com\\\" OR \\\"@hotmail.com\\\" OR \\\"@outlook.com\\\" OR \\\"@yahoo.com\\\"\",\n    \"site:instagram.com+\\\"periodoncia\\\"+\\\"@gmail.com\\\" OR \\\"@hotmail.com\\\" OR \\\"@outlook.com\\\" OR \\\"@yahoo.com\\\"\",\n    \"site:instagram.com+\\\"blanqueamiento+dental\\\"+\\\"@gmail.com\\\" OR \\\"@hotmail.com\\\" OR \\\"@outlook.com\\\" OR \\\"@yahoo.com\\\"\",\n    \"site:instagram.com+\\\"implantes+dentales\\\"+\\\"@gmail.com\\\" OR \\\"@hotmail.com\\\" OR \\\"@outlook.com\\\" OR \\\"@yahoo.com\\\"\",\n    \"site:instagram.com+\\\"odontopediatria\\\"+\\\"@gmail.com\\\" OR \\\"@hotmail.com\\\" OR \\\"@outlook.com\\\" OR \\\"@yahoo.com\\\"\",\n    \"site:instagram.com+\\\"terapia+oral\\\"+\\\"@gmail.com\\\" OR \\\"@hotmail.com\\\" OR \\\"@outlook.com\\\" OR \\\"@yahoo.com\\\"\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -656,
+        624
+      ],
+      "id": "4579274b-1c4e-48c4-b157-00c9f026fa52",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        416
+      ],
+      "id": "827ceb5a-d6a0-4f6c-85c2-e3be959491f5",
+      "name": "Wait1",
+      "webhookId": "20957c0c-ee00-4b5f-a456-3270b8e49a2b"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "new",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        592,
+        416
+      ],
+      "id": "c795dcfd-96e9-4d21-9dcd-1536f0f78849",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "W9E9G5CNS7uWzaSn",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "={{ $workflow.id }}",
+          "mode": "id",
+          "cachedResultUrl": "/workflow/=%7B%7B%20$workflow.id%20%7D%7D"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "cantidadConsultas",
+              "displayName": "cantidadConsultas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "tipoNegocio",
+              "displayName": "tipoNegocio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        0
+      ],
+      "id": "7fbe3105-3400-4f74-a252-69a2e24508d7",
+      "name": "Execute Workflow1"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $json.message.from.id }}",
+        "message": "Hola, para poder continuar, Indica la cantidad de consultas y el tipo de negocio que deseas buscar.",
+        "responseType": "freeText",
+        "options": {
+          "messageButtonLabel": "Responder",
+          "responseFormTitle": "Detalles de solicitud",
+          "responseFormDescription": "Por favor, indícanos cuántas consultas necesitas y el tipo de negocio que deseas buscar. Esta información nos ayudará a brindarte una atención personalizada y eficiente.",
+          "responseFormButtonLabel": "Enviar",
+          "responseFormCustomCss": ":root {\n\t/* Fuente */\n\t--font-family: 'Open Sans', sans-serif;\n\t--font-weight-normal: 400;\n\t--font-weight-bold: 600;\n\t--font-size-body: 14px;\n\t--font-size-label: 15px;\n\t--font-size-test-notice: 13px;\n\t--font-size-input: 15px;\n\t--font-size-header: 22px;\n\t--font-size-paragraph: 15px;\n\t--font-size-link: 14px;\n\t--font-size-error: 13px;\n\t--font-size-html-h1: 28px;\n\t--font-size-html-h2: 22px;\n\t--font-size-html-h3: 18px;\n\t--font-size-html-h4: 16px;\n\t--font-size-html-h5: 14px;\n\t--font-size-html-h6: 12px;\n\t--font-size-subheader: 16px;\n\n\t/* Colors */\n    --color-background: #c4c7c7; /* Fondo gris claro */\n\t--color-test-notice-text: #ffffff;\n\t--color-test-notice-bg: #dfe2e2;\n\t--color-test-notice-border: #b0b3b3;\n\t--color-card-bg: #c4c7c7; /* Tarjeta igual al fondo */\n\t--color-card-border: #a8abab;\n\t--color-card-shadow: rgba(0, 0, 0, 0.08);\n\t--color-link: #ffffff;\n\t--color-header: #ffffff;\n\t--color-label: #ffffff;\n\t--color-input-border: #a8abab;\n\t--color-input-text: #000000; /* Texto en inputs: negro para legibilidad */\n\t--color-focus-border: #132c4c; /* Azul oscuro al hacer foco */\n\t--color-submit-btn-bg: #132c4c; /* Botón en azul oscuro */\n\t--color-submit-btn-text: #ffffff;\n\t--color-error: #ff6d5a; /* Rojo/naranja suave para errores (visible sobre gris) */\n\t--color-required: #ff6d5a;\n\t--color-clear-button-bg: #a8abab;\n\t--color-html-text: #ffffff;\n\t--color-html-link: #ffffff;\n\t--color-header-subtext: #e0e0e0;\n\t/* Border Radii */\n\t--border-radius-card: 12px;\n\t--border-radius-input: 8px;\n\t--border-radius-clear-btn: 50%;\n\t--card-border-radius: 12px;\n\n\t/* Spacing */\n\t--padding-container-top: 32px;\n\t--padding-card: 28px;\n\t--padding-test-notice-vertical: 14px;\n\t--padding-test-notice-horizontal: 26px;\n\t--margin-bottom-card: 20px;\n\t--padding-form-input: 14px;\n\t--card-padding: 28px;\n\t--card-margin-bottom: 20px;\n\n\t/* Dimensions */\n\t--container-width: 480px;\n\t--submit-btn-height: 52px;\n\t--checkbox-size: 20px;\n\n\t/* Others */\n\t--box-shadow-card: 0 6px 20px var(--color-card-shadow);\n\t--opacity-placeholder: 0.7;\n}",
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1008,
+        0
+      ],
+      "id": "a7419e21-124b-436b-ba69-93f54124741a",
+      "name": "Send message and wait for response1",
+      "webhookId": "45e48872-fba3-4462-bfd4-eb510f8a9a3a",
+      "credentials": {
+        "telegramApi": {
+          "id": "iKIJn7aQygNFPjk4",
+          "name": "Telegram-scrafbin_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Extrae del siguiente mensaje del usuario la cantidad de consultas solicitadas y el tipo de negocio mencionado. Responde SOLO con un objeto JSON que contenga exactamente dos campos: \"cantidadConsultas\" (número entero) y \"tipoNegocio\" (cadena de texto en minúsculas, sin artículos ni palabras adicionales).\n\nMensaje del usuario: \"{{ $json.data.text }}\"",
+        "options": {
+          "systemMessage": "Eres un extractor de datos preciso. Tu única tarea es analizar el mensaje del usuario, identificar la cantidad numérica de registros solicitados y el tipo de negocio (como \"clínicas\", \"restaurantes\", \"farmacias\", etc.), y devolver EXCLUSIVAMENTE un objeto JSON con las claves \"cantidadConsultas\" y \"tipoNegocio\". No añadas explicaciones, comentarios, formato adicional ni texto fuera del JSON."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -800,
+        0
+      ],
+      "id": "f1d016e7-f1fb-4140-9593-1e5d115a2587",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "shisa-ai/shisa-v2-llama3.3-70b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        176
+      ],
+      "id": "97fd4b04-bc83-46c5-940a-22ce1e9e226c",
+      "name": "OpenRouter Chat Model3",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TZtdDTD8IX1w0r2b",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  let text = item.json.output || '';\n\n  // Elimina backticks, \"json\", saltos de línea, y espacios extra\n  let clean = text\n    .replace(/```/g, '')            // Elimina todos los backticks\n    .replace(/json/gi, '')          // Elimina la palabra \"json\" (case-insensitive)\n    .replace(/\\\\n/g, '')            // Elimina los \"\\n\" literales (barra + n)\n    .replace(/\\s+/g, ' ')           // Convierte múltiples espacios en uno\n    .trim();\n\n  try {\n    const data = JSON.parse(clean);\n    item.json.cantidadConsultas = data.cantidadConsultas || 0;\n    item.json.tipoNegocio = (data.tipoNegocio || '').trim();\n  } catch (e) {\n    item.json.cantidadConsultas = 0;\n    item.json.tipoNegocio = '';\n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        0
+      ],
+      "id": "86426442-d907-4a18-a348-0c1dbd395553",
+      "name": "Code in JavaScript5"
+    }
+  ],
+  "connections": {
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resultados1": {
+      "main": [
+        [
+          {
+            "node": "Extraer datos1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Resultados1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generar queries1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar queries1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar queries1": {
+      "main": [
+        [
+          {
+            "node": "Separar queries1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generar queries1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Loop queries1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "b19bbf1a-ab06-45e3-9d64-e9a644af5170",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-09T01:54:39.871Z",
+      "createdAt": "2026-08-09T01:54:39.871Z",
+      "role": "workflow:owner",
+      "workflowId": "KmRbD7SxYZfrzA9e",
+      "projectId": "zaQNXN7Imke7KSJ4"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
