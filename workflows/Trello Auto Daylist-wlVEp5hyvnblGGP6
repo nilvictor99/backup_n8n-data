@@ -1,0 +1,322 @@
+{
+  "updatedAt": "2026-08-09T01:54:37.539Z",
+  "createdAt": "2026-08-09T01:54:37.539Z",
+  "id": "wlVEp5hyvnblGGP6",
+  "name": "Trello Auto Daylist",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -192,
+        -16
+      ],
+      "id": "78da104d-fe20-46dc-9120-0200bfe7f7b8",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtiene los primeros tres días del mes actual\nconst now = new Date();\nconst year = now.getFullYear();\nconst month = now.getMonth(); // 0 = enero, 11 = diciembre\n\n// Genera array de días: [1, 2, 3]\nconst days = [1, 2, 3];\n\n// Crea un item por cada día\nreturn days.map(day => ({\n  json: {\n    day: day,\n    date: new Date(year, month, day).toISOString().split('T')[0], // e.g., \"2025-10-01\"\n    monthName: new Date(year, month, 1).toLocaleString('es-ES', { month: 'long' }).toUpperCase(), // e.g., \"OCTUBRE\"\n    year: year\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        -192
+      ],
+      "id": "dd61a2fe-0e38-4b44-97fb-0c91f4595d03",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b54abd5b-5dae-4a09-bfc1-4472c62d9788",
+              "name": "dia",
+              "value": "={{ $json.day }}",
+              "type": "string"
+            },
+            {
+              "id": "3b52d796-a323-461c-baad-f84b6b390cef",
+              "name": "mes",
+              "value": "={{ $json.monthName }}",
+              "type": "string"
+            },
+            {
+              "id": "2a97d77f-5d51-4f4a-987e-c71fd33dda76",
+              "name": "año",
+              "value": "={{ $json.year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1056,
+        -192
+      ],
+      "id": "cba4e8c1-40c2-4413-b8fb-93f4401307a9",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  const now = new Date();\n  item.json.mesActual = now.toLocaleString('es-ES', { month: 'long' }).toLocaleUpperCase(); // Mes actual (e.g., \"octubre\")\n  item.json.añoActual = now.getFullYear(); // Año actual (e.g., 2025)\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        -16
+      ],
+      "id": "e514aa7b-47dd-429b-a812-9e29f111c870",
+      "name": "Obtener Año y Mes"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "635cae2c-62c4-4345-9592-c08248f3213d",
+              "name": "monthName",
+              "value": "={{ $json.mesActual }}",
+              "type": "string"
+            },
+            {
+              "id": "292e158c-ecd3-430f-b4b8-88afb0aab6dc",
+              "name": "year",
+              "value": "={{ $json['añoActual'] }}",
+              "type": "string"
+            },
+            {
+              "id": "45859624-f209-4a9e-b1c3-a494e973e6e1",
+              "name": "Board ID",
+              "value": "68ed286c28f43324c6e545fe",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        -16
+      ],
+      "id": "4528eac6-8796-4468-9d15-85044fc2192c",
+      "name": "Definir Campos"
+    },
+    {
+      "parameters": {
+        "resource": "list",
+        "idBoard": "={{ $json['Board ID'] }}",
+        "name": "=DAYLIST: {{ $json.monthName }} DEL {{ $json.year }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        560,
+        -16
+      ],
+      "id": "56d03474-d013-449f-9dc1-57883ddc454a",
+      "name": "Crear La Nueva lista",
+      "credentials": {
+        "trelloApi": {
+          "id": "8zuQzCilM8wJoiwJ",
+          "name": "Trello-data"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst year = now.getFullYear();\nconst month = now.getMonth();\nconst lastDay = new Date(year, month + 1, 0).getDate(); // Último día del mes\n\nconst days = Array.from({ length: lastDay }, (_, i) => ({\n  json: {\n    day: i + 1,\n    date: new Date(year, month, i + 1).toISOString().split('T')[0],\n    monthName: \"OCTUBRE\",\n    year: year\n  }\n}));\n\nreturn days.map(item => item.json);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        -16
+      ],
+      "id": "9f7ac8ca-577d-4759-8178-4de3f33df201",
+      "name": "Obtener Todos Los Dias Del Mes"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "669b7a03-e4ab-4aaa-aacf-37b33c8d8c27",
+              "name": "DIA",
+              "value": "={{ $json.day }}",
+              "type": "string"
+            },
+            {
+              "id": "89239a39-a872-4449-ac91-abea07caaa58",
+              "name": "MES",
+              "value": "={{ $json.monthName }}",
+              "type": "string"
+            },
+            {
+              "id": "b887a57b-7409-4b01-9332-36c12be57531",
+              "name": "AÑO",
+              "value": "={{ $json.year }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1056,
+        -16
+      ],
+      "id": "0b6d0477-b715-499a-9d8b-ad59f7d56f48",
+      "name": "Definir Los Dias"
+    },
+    {
+      "parameters": {
+        "listId": "={{ $('Crear La Nueva lista').item.json.id }}",
+        "name": "={{ $json.DIA }} DE {{ $json.MES }} DEl {{ $json['AÑO'] }}",
+        "description": "Este espacio es para registrar lo que cada persona del equipo de desarrollo hizo hoy, en qué está trabajando, qué obstáculos encontró y qué hará después. El objetivo es tener visibilidad del progreso diario.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        -16
+      ],
+      "id": "8bd27fc7-4b4d-42b6-bd1b-d9e9f27ad0d5",
+      "name": "Crear Las Cartas Diarias",
+      "credentials": {
+        "trelloApi": {
+          "id": "8zuQzCilM8wJoiwJ",
+          "name": "Trello-data"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Obtener Año y Mes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        []
+      ]
+    },
+    "Obtener Año y Mes": {
+      "main": [
+        [
+          {
+            "node": "Definir Campos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Definir Campos": {
+      "main": [
+        [
+          {
+            "node": "Crear La Nueva lista",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear La Nueva lista": {
+      "main": [
+        [
+          {
+            "node": "Obtener Todos Los Dias Del Mes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Todos Los Dias Del Mes": {
+      "main": [
+        [
+          {
+            "node": "Definir Los Dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Definir Los Dias": {
+      "main": [
+        [
+          {
+            "node": "Crear Las Cartas Diarias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "e92a0526-9667-4c17-b257-cc32912262c5",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-09T01:54:37.539Z",
+      "createdAt": "2026-08-09T01:54:37.539Z",
+      "role": "workflow:owner",
+      "workflowId": "wlVEp5hyvnblGGP6",
+      "projectId": "zaQNXN7Imke7KSJ4"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
