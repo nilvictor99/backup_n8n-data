@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-08T16:34:04.307Z",
+  "updatedAt": "2026-08-09T01:19:45.857Z",
   "createdAt": "2026-04-04T17:32:45.498Z",
   "id": "GKjJwgbZ88o1NSOc",
   "name": "Product Price Monitor - Email Alert",
@@ -322,7 +322,7 @@
   },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "0a7b66f4-3ca8-4edc-a409-7e8d19277046",
+  "versionId": "f2725d47-e5fc-42c8-b277-1a9d0e5bfb2d",
   "activeVersionId": "0a7b66f4-3ca8-4edc-a409-7e8d19277046",
   "triggerCount": 1,
   "shared": [
