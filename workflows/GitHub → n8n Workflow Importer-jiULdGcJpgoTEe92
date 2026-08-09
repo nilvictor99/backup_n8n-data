@@ -1,0 +1,204 @@
+{
+  "updatedAt": "2026-08-09T02:06:56.875Z",
+  "createdAt": "2026-08-09T01:24:08.920Z",
+  "id": "jiULdGcJpgoTEe92",
+  "name": "GitHub → n8n Workflow Importer",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "create",
+        "workflowObject": "={{ JSON.stringify({\n  name: $json.data.name,\n  nodes: $json.data.nodes,\n  connections: $json.data.connections,\n  settings: $json.data.settings || {}\n}) }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        480,
+        0
+      ],
+      "id": "ea3f78f0-3017-4385-afcd-90eb553a080c",
+      "name": "Create a workflow",
+      "credentials": {
+        "n8nApi": {
+          "id": "hAtxc9klCsIR0aF4",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        0
+      ],
+      "id": "71cdd111-35d3-42ba-b5ba-85a458af6b05",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "owner": {
+          "__rl": true,
+          "value": "nilvictor99",
+          "mode": "list",
+          "cachedResultName": "nilvictor99",
+          "cachedResultUrl": "https://github.com/nilvictor99"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "n8n-workflows",
+          "mode": "list",
+          "cachedResultName": "n8n-workflows",
+          "cachedResultUrl": "https://github.com/nilvictor99/n8n-workflows"
+        },
+        "filePath": "./",
+        "asBinaryProperty": false,
+        "additionalParameters": {}
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        -128,
+        0
+      ],
+      "id": "233d0004-e297-4fa2-8aa0-f7c147eec841",
+      "name": "Get a file",
+      "webhookId": "96079065-cf7f-4534-846a-8fa44a75344f",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "get",
+        "owner": {
+          "__rl": true,
+          "value": "nilvictor99",
+          "mode": "list",
+          "cachedResultName": "nilvictor99",
+          "cachedResultUrl": "https://github.com/nilvictor99"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "n8n-workflows",
+          "mode": "list",
+          "cachedResultName": "n8n-workflows",
+          "cachedResultUrl": "https://github.com/nilvictor99/n8n-workflows"
+        },
+        "filePath": "={{ $json.path }}",
+        "additionalParameters": {}
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        0
+      ],
+      "id": "0824b234-b7fb-44a7-9cf1-fde7e11c03a1",
+      "name": "Get a file1",
+      "webhookId": "cb7bf017-3529-4560-8e6e-6e32482c25d2",
+      "credentials": {
+        "githubApi": {
+          "id": "2ROwtZAiVTnYlkOQ",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        288,
+        0
+      ],
+      "id": "2cb8c17f-aaae-4a0d-9b2e-7991a97442ae",
+      "name": "Extract from File"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Get a file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Create a workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "6251161e-7378-44d6-b793-9156c71ede54",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-09T01:24:08.920Z",
+      "createdAt": "2026-08-09T01:24:08.920Z",
+      "role": "workflow:owner",
+      "workflowId": "jiULdGcJpgoTEe92",
+      "projectId": "zaQNXN7Imke7KSJ4"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
