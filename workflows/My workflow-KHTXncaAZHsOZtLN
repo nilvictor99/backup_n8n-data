@@ -1,0 +1,102 @@
+{
+  "updatedAt": "2026-08-09T21:20:15.569Z",
+  "createdAt": "2026-08-09T20:20:25.197Z",
+  "id": "KHTXncaAZHsOZtLN",
+  "name": "My workflow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "sendVideo"
+      },
+      "type": "n8n-nodes-instagram-integrations.instagram",
+      "typeVersion": 1,
+      "position": [
+        144,
+        144
+      ],
+      "id": "c7276347-de95-4ba5-b519-b759aa4a2279",
+      "name": "Send a video message",
+      "credentials": {
+        "instagramOAuth2Api": {
+          "id": "4aE7iB2drFMpZYQ3",
+          "name": "Instagram account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        352,
+        144
+      ],
+      "id": "d943243d-015d-4c4c-8e9a-df5c1729eaea",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        560,
+        144
+      ],
+      "id": "4459c2f9-c2bd-4dc1-9cd9-6d711c22ba45",
+      "name": "Facebook Graph API"
+    }
+  ],
+  "connections": {
+    "Send a video message": {
+      "main": [
+        [
+          {
+            "node": "Facebook Graph API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Facebook Graph API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "bacc8a58-ed46-4fce-912f-4d37bf491b6e",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-09T20:20:25.197Z",
+      "createdAt": "2026-08-09T20:20:25.197Z",
+      "role": "workflow:owner",
+      "workflowId": "KHTXncaAZHsOZtLN",
+      "projectId": "zaQNXN7Imke7KSJ4"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
