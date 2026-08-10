@@ -1,0 +1,2608 @@
+{
+  "updatedAt": "2026-08-09T19:35:57.080Z",
+  "createdAt": "2026-08-09T18:23:11.777Z",
+  "id": "XVixi7pC5u4jsUy4",
+  "name": "uploader yutube",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ab80e6fe-32ab-40c7-ae00-27bcc73121d3",
+              "leftValue": true,
+              "rightValue": "={{ $json.Upload }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        -144
+      ],
+      "id": "74593038-4890-4288-b733-2cd4846d3a9b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1bH6VKt_E0L0-8IVyNOEywPtoSjOj7e5IB_KJrooDFUA",
+          "mode": "list",
+          "cachedResultName": "funk-list",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bH6VKt_E0L0-8IVyNOEywPtoSjOj7e5IB_KJrooDFUA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1365483959,
+          "mode": "list",
+          "cachedResultName": "data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bH6VKt_E0L0-8IVyNOEywPtoSjOj7e5IB_KJrooDFUA/edit#gid=1365483959"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        32,
+        -144
+      ],
+      "id": "4d9ed487-1194-45c7-acd2-e470daa9d42e",
+      "name": "obtener registros",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TPObVut2WDyKHixN",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -160,
+        -144
+      ],
+      "id": "08836a19-f53c-42c0-908e-8e7f1788a657",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// === Descripción + Tags + Hashtag + Emoji aleatorio para TODOS los videos ===\nconst description = `🎵 Nueva canción Funk original\nGroove profundo, bajos potentes y vibes clásicas.\nCreada para los verdaderos amantes del funk.\n🔥 Suscríbete para no perderte los próximos tracks\n📲 Sígueme en mis redes:\n• Instagram → https://instagram.com/musicando_funk\n• TikTok → https://tiktok.com/@musicando_funk\n• Twitter/X → https://x.com/musicando_funk\n• Spotify → https://open.spotify.com/artist/musicando\n💬 ¿Qué estilo de funk quieres escuchar después? Comenta\n#Funk #MúsicaFunk #FunkyBeats #FunkOriginal #NuevoFunk`;\n\nconst tags = \"Funk, MúsicaFunk, FunkyBeats, FunkOriginal, NuevoFunk, Funk Music, Groove, Bajos potentes, Funk latino, Música funk original\";\n\n// === HASHTAG + EMOJI ALEATORIO (se agrega después del título) ===\nconst hashtagsPool = [\n  \"#FunkIndependiente\", \"#MúsicaFunk\", \"#EnergíaFunk\",\n  \"#MotivaciónFunk\", \"#FunkVibes\", \"#GrooveIndependiente\",\n  \"#NuevaMusica\", \"#FunkEnergetico\", \"#FunkMotivador\",\n  \"#IndieFunk\", \"#MúsicaOriginal\", \"#FunkCreaciones\"\n];\nconst randomHashtag = hashtagsPool[Math.floor(Math.random() * hashtagsPool.length)];\n\nconst emojis = [\"🔥\", \"⚡\", \"💪\", \"🚀\", \"🌀\", \"🌟\", \"🎧\", \"❤️\", \"😎\", \"💥\", \"🎉\", \"🔥\"];\nconst randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];\n\n// === ACTIVACIÓN - DEVOLVER TODO ===\nreturn $input.all().map(item => {\n  return {\n    json: {\n      ...item.json,\n      description: description,\n      tags: tags,\n      \n      // Nuevo: hashtag + emoji aleatorio después del título\n      hashtags: randomHashtag,\n      emojis: randomEmoji\n    },\n    binary: item.binary\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -128
+      ],
+      "id": "5fe695e3-52cc-4818-8716-17e1abee991b",
+      "name": "define detalles"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "e731e871-1edf-4b19-acd1-f5175bce8506",
+      "name": "Descargar video",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        560,
+        -128
+      ],
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bPAvSDvNBNBpzbZp",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $json.Nombre.replace(/\\.[^/.]+$/, \"\") }} {{ $json.hashtags }}{{ $json.emojis }}",
+        "regionCode": "PE",
+        "categoryId": "10",
+        "options": {
+          "defaultLanguage": "es-US",
+          "description": "={{ $json.description }}",
+          "privacyStatus": "public",
+          "tags": "={{ $json.tags }}"
+        }
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        752,
+        -128
+      ],
+      "id": "57e6d181-ade8-4dac-9e1a-e2ae504ab0ab",
+      "name": "subir video",
+      "alwaysOutputData": true,
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "H6Asynd3KP9HnXGl",
+          "name": "YouTube account abden"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "funk-list",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        944,
+        -128
+      ],
+      "id": "bab3eea6-bb4d-4474-a6b1-7afd34f3cca5",
+      "name": "busca el registro",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bPAvSDvNBNBpzbZp",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1365483959,
+          "mode": "list",
+          "cachedResultName": "data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bH6VKt_E0L0-8IVyNOEywPtoSjOj7e5IB_KJrooDFUA/edit#gid=1365483959"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Descargar video').item.json.id }}",
+            "Upload": "true"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tipo",
+              "displayName": "Tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Extension",
+              "displayName": "Extension",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tamaño_bytes",
+              "displayName": "Tamaño_bytes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tamaño_MB",
+              "displayName": "Tamaño_MB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Creado",
+              "displayName": "Creado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Modificado",
+              "displayName": "Modificado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ultima_Actualizacion",
+              "displayName": "Ultima_Actualizacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Today_Create",
+              "displayName": "Today_Create",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Upload",
+              "displayName": "Upload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "059c41f0-de66-41ec-b737-ad3f60eeeb8d",
+      "name": "actualiza el registro",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1136,
+        -128
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TPObVut2WDyKHixN",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "Estado intermedio: si algo se corta después de esto, ves visualmente en el Sheet qué video quedó a medias."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ab80e6fe-32ab-40c7-ae00-27bcc73121d3",
+              "leftValue": true,
+              "rightValue": "={{ $json.Upload }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        80
+      ],
+      "id": "4324d3aa-2a4a-4c19-b409-10c156021a62",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1OP83cGEU-s5FDGA4RnHz-peq-2yU9k2YGigm0atA0I4",
+          "mode": "list",
+          "cachedResultName": "rock-list",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OP83cGEU-s5FDGA4RnHz-peq-2yU9k2YGigm0atA0I4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1437928794,
+          "mode": "list",
+          "cachedResultName": "data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OP83cGEU-s5FDGA4RnHz-peq-2yU9k2YGigm0atA0I4/edit#gid=1437928794"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        32,
+        80
+      ],
+      "id": "84d7dd9b-5e9a-4d2e-8dcf-272cbd7c75d0",
+      "name": "obtener registros1",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TPObVut2WDyKHixN",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -160,
+        80
+      ],
+      "id": "fa4683e4-9bb3-4d69-ae84-bc3d636893d2",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// JS PARA ROCK\nconst description = `🎸 Nueva canción Rock original\nGroove potente, guitarras eléctricas y riffs épicos.\nCreada para los verdaderos amantes del rock clásico.\n🔥 Suscríbete para no perderte los próximos tracks\n📲 Sígueme en mis redes:\n• Instagram → https://instagram.com/musicando_rock\n• TikTok → https://tiktok.com/@musicando_rock\n• Twitter/X → https://x.com/musicando_rock\n• Spotify → https://open.spotify.com/artist/musicando\n💬 ¿Qué estilo de rock quieres escuchar después? Comenta\n#Rock #MúsicaRock #RockClásico #NuevoRock`;\n\nconst tags = \"Rock, MúsicaRock, RockClásico, NuevoRock, RockOriginal, GuitarrasEléctricas, RockEnergetico\";\n\n// === HASHTAG + EMOJI ALEATORIO ===\nconst hashtagsPool = [\n  \"#RockIndependiente\", \"#MúsicaRock\", \"#EnergíaRock\",\n  \"#MotivaciónRock\", \"#RockVibes\", \"#GrooveRock\",\n  \"#NuevaMusica\", \"#RockEnergetico\", \"#RockMotivador\",\n  \"#IndieRock\", \"#MúsicaOriginal\", \"#RockCreaciones\"\n];\nconst randomHashtag = hashtagsPool[Math.floor(Math.random() * hashtagsPool.length)];\n\nconst emojis = [\"🔥\", \"⚡\", \"💪\", \"🚀\", \"🌀\", \"🌟\", \"🎧\", \"❤️\", \"😎\", \"💥\", \"🎉\", \"🔥\"];\nconst randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];\n\n// === ACTIVACIÓN - DEVOLVER TODO ===\nreturn $input.all().map(item => {\n  return {\n    json: {\n      ...item.json,\n      description: description,\n      tags: tags,\n      hashtags: randomHashtag,\n      emojis: randomEmoji\n    },\n    binary: item.binary\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        96
+      ],
+      "id": "d15008d9-25f9-4a43-adf8-f63d524f5827",
+      "name": "define detalles1"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "8a2dc39e-f50e-4c25-a4e0-158e3c19dc0f",
+      "name": "Descargar video1",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        560,
+        96
+      ],
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bPAvSDvNBNBpzbZp",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $json.Nombre.replace(/\\.[^/.]+$/, \"\") }} {{ $json.hashtags }}{{ $json.emojis }}",
+        "regionCode": "PE",
+        "categoryId": "10",
+        "options": {
+          "defaultLanguage": "es-US",
+          "description": "={{ $json.description }}",
+          "privacyStatus": "public",
+          "tags": "={{ $json.tags }}"
+        }
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        752,
+        96
+      ],
+      "id": "e8b3c747-fdc3-4bc3-849f-98560a0a7d30",
+      "name": "subir video1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "H6Asynd3KP9HnXGl",
+          "name": "YouTube account abden"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "rock-list",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        944,
+        96
+      ],
+      "id": "a3ba0555-9879-494a-acc9-12f9c8d0dc4a",
+      "name": "busca el registro1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bPAvSDvNBNBpzbZp",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1365483959,
+          "mode": "list",
+          "cachedResultName": "data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bH6VKt_E0L0-8IVyNOEywPtoSjOj7e5IB_KJrooDFUA/edit#gid=1365483959"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Descargar video1').item.json.id }}",
+            "Upload": "true"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tipo",
+              "displayName": "Tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Extension",
+              "displayName": "Extension",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tamaño_bytes",
+              "displayName": "Tamaño_bytes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tamaño_MB",
+              "displayName": "Tamaño_MB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Creado",
+              "displayName": "Creado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Modificado",
+              "displayName": "Modificado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ultima_Actualizacion",
+              "displayName": "Ultima_Actualizacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Today_Create",
+              "displayName": "Today_Create",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Upload",
+              "displayName": "Upload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "ba76d250-dff7-4506-92b1-3e71fb1ff2d2",
+      "name": "actualiza el registro1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1136,
+        96
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TPObVut2WDyKHixN",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "Estado intermedio: si algo se corta después de esto, ves visualmente en el Sheet qué video quedó a medias."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ab80e6fe-32ab-40c7-ae00-27bcc73121d3",
+              "leftValue": true,
+              "rightValue": "={{ $json.Upload }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        304
+      ],
+      "id": "1f5701c9-7977-4398-8a75-0550ce42fc2e",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1LVoTT8cbfKrJQ5fJTwntXvCWqCR8ujgQDsl7d4U0R8o",
+          "mode": "list",
+          "cachedResultName": "instrumental-list",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LVoTT8cbfKrJQ5fJTwntXvCWqCR8ujgQDsl7d4U0R8o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 701214241,
+          "mode": "list",
+          "cachedResultName": "data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LVoTT8cbfKrJQ5fJTwntXvCWqCR8ujgQDsl7d4U0R8o/edit#gid=701214241"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        32,
+        304
+      ],
+      "id": "42c6fce9-368c-467b-a539-282c31b36af7",
+      "name": "obtener registros2",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TPObVut2WDyKHixN",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -160,
+        304
+      ],
+      "id": "c5907421-0dd3-41a7-8f8a-cf033e2c5b06",
+      "name": "Schedule Trigger2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// JS PARA INSTRUMENTAL\nconst description = `🎹 Nueva canción Instrumental original\nSonidos puros, ritmos atmosféricos y melodías sin voz.\nCreada para los verdaderos amantes de la música instrumental.\n🔥 Suscríbete para no perderte los próximos tracks\n📲 Sígueme en mis redes:\n• Instagram → https://instagram.com/musicando_instrumental\n• TikTok → https://tiktok.com/@musicando_instrumental\n• Twitter/X → https://x.com/musicando_instrumental\n• Spotify → https://open.spotify.com/artist/musicando\n💬 ¿Qué estilo instrumental quieres escuchar después? Comenta\n#Instrumental #MúsicaInstrumental #SinVoz #NuevoInstrumental`;\n\nconst tags = \"Instrumental, MúsicaInstrumental, SinVoz, NuevoInstrumental, SonidosPuros, RitmosAtmosféricos, MúsicaSinVoz, NuevoInstrumental\";\n\n// === HASHTAG + EMOJI ALEATORIO ===\nconst hashtagsPool = [\n  \"#InstrumentalIndependiente\", \"#MúsicaInstrumental\", \"#EnergíaInstrumental\",\n  \"#MotivaciónInstrumental\", \"#InstrumentalVibes\", \"#GrooveInstrumental\",\n  \"#NuevaMusica\", \"#InstrumentalEnergetico\", \"#InstrumentalMotivador\",\n  \"#IndieInstrumental\", \"#MúsicaOriginal\", \"#InstrumentalCreaciones\"\n];\nconst randomHashtag = hashtagsPool[Math.floor(Math.random() * hashtagsPool.length)];\n\nconst emojis = [\"🔥\", \"⚡\", \"💪\", \"🚀\", \"🌀\", \"🌟\", \"🎧\", \"❤️\", \"😎\", \"💥\", \"🎉\", \"🔥\"];\nconst randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];\n\n// === ACTIVACIÓN - DEVOLVER TODO ===\nreturn $input.all().map(item => {\n  return {\n    json: {\n      ...item.json,\n      description: description,\n      tags: tags,\n      hashtags: randomHashtag,\n      emojis: randomEmoji\n    },\n    binary: item.binary\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        320
+      ],
+      "id": "238796ae-4bb0-40e8-a6c9-7271516ae4aa",
+      "name": "define detalles2"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "id": "e66f4962-960c-4bb7-b945-90800ec51bfa",
+      "name": "Descargar video2",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        560,
+        320
+      ],
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bPAvSDvNBNBpzbZp",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $json.Nombre.replace(/\\.[^/.]+$/, \"\") }} {{ $json.hashtags }}{{ $json.emojis }}",
+        "regionCode": "PE",
+        "categoryId": "10",
+        "options": {
+          "defaultLanguage": "es-US",
+          "description": "={{ $json.description }}",
+          "privacyStatus": "public",
+          "tags": "={{ $json.tags }}"
+        }
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        752,
+        320
+      ],
+      "id": "23010e7b-b7eb-4244-a9be-920727da30ab",
+      "name": "subir video2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "H6Asynd3KP9HnXGl",
+          "name": "YouTube account abden"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "instrumental-list",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        944,
+        320
+      ],
+      "id": "301c8341-520d-4b9f-a0a4-13f7a35401bd",
+      "name": "busca el registro2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bPAvSDvNBNBpzbZp",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1365483959,
+          "mode": "list",
+          "cachedResultName": "data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bH6VKt_E0L0-8IVyNOEywPtoSjOj7e5IB_KJrooDFUA/edit#gid=1365483959"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Descargar video2').item.json.id }}",
+            "Upload": "true"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tipo",
+              "displayName": "Tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Extension",
+              "displayName": "Extension",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tamaño_bytes",
+              "displayName": "Tamaño_bytes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tamaño_MB",
+              "displayName": "Tamaño_MB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Creado",
+              "displayName": "Creado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Modificado",
+              "displayName": "Modificado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ultima_Actualizacion",
+              "displayName": "Ultima_Actualizacion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Today_Create",
+              "displayName": "Today_Create",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Upload",
+              "displayName": "Upload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "0a7882d3-3355-49e2-8d3d-67c4bbc1bda0",
+      "name": "actualiza el registro2",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1136,
+        320
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TPObVut2WDyKHixN",
+          "name": "Google Sheets account"
+        }
+      },
+      "notes": "Estado intermedio: si algo se corta después de esto, ves visualmente en el Sheet qué video quedó a medias."
+    }
+  ],
+  "connections": {
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "define detalles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "obtener registros": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "obtener registros",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "define detalles": {
+      "main": [
+        [
+          {
+            "node": "Descargar video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar video": {
+      "main": [
+        [
+          {
+            "node": "subir video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "subir video": {
+      "main": [
+        [
+          {
+            "node": "busca el registro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca el registro": {
+      "main": [
+        [
+          {
+            "node": "actualiza el registro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "define detalles1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "obtener registros1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "obtener registros1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "define detalles1": {
+      "main": [
+        [
+          {
+            "node": "Descargar video1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar video1": {
+      "main": [
+        [
+          {
+            "node": "subir video1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "subir video1": {
+      "main": [
+        [
+          {
+            "node": "busca el registro1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca el registro1": {
+      "main": [
+        [
+          {
+            "node": "actualiza el registro1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "define detalles2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "obtener registros2": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger2": {
+      "main": [
+        [
+          {
+            "node": "obtener registros2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "define detalles2": {
+      "main": [
+        [
+          {
+            "node": "Descargar video2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Descargar video2": {
+      "main": [
+        [
+          {
+            "node": "subir video2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "subir video2": {
+      "main": [
+        [
+          {
+            "node": "busca el registro2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "busca el registro2": {
+      "main": [
+        [
+          {
+            "node": "actualiza el registro2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    },
+    "node:Schedule Trigger1": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    },
+    "node:Schedule Trigger2": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "2cfd7c38-4fa9-448d-92ad-7886e8b773e5",
+  "activeVersionId": "2cfd7c38-4fa9-448d-92ad-7886e8b773e5",
+  "triggerCount": 3,
+  "shared": [
+    {
+      "updatedAt": "2026-08-09T18:23:11.777Z",
+      "createdAt": "2026-08-09T18:23:11.777Z",
+      "role": "workflow:owner",
+      "workflowId": "XVixi7pC5u4jsUy4",
+      "projectId": "zaQNXN7Imke7KSJ4"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-08-09T19:36:02.539Z",
+    "createdAt": "2026-08-09T19:13:07.273Z",
+    "versionId": "2cfd7c38-4fa9-448d-92ad-7886e8b773e5",
+    "workflowId": "XVixi7pC5u4jsUy4",
+    "nodes": [
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "ab80e6fe-32ab-40c7-ae00-27bcc73121d3",
+                "leftValue": true,
+                "rightValue": "={{ $json.Upload }}",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          208,
+          -144
+        ],
+        "id": "74593038-4890-4288-b733-2cd4846d3a9b",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1bH6VKt_E0L0-8IVyNOEywPtoSjOj7e5IB_KJrooDFUA",
+            "mode": "list",
+            "cachedResultName": "funk-list",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bH6VKt_E0L0-8IVyNOEywPtoSjOj7e5IB_KJrooDFUA/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1365483959,
+            "mode": "list",
+            "cachedResultName": "data",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bH6VKt_E0L0-8IVyNOEywPtoSjOj7e5IB_KJrooDFUA/edit#gid=1365483959"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          32,
+          -144
+        ],
+        "id": "4d9ed487-1194-45c7-acd2-e470daa9d42e",
+        "name": "obtener registros",
+        "executeOnce": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "TPObVut2WDyKHixN",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {}
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -160,
+          -144
+        ],
+        "id": "08836a19-f53c-42c0-908e-8e7f1788a657",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "jsCode": "// === Descripción + Tags + Hashtag + Emoji aleatorio para TODOS los videos ===\nconst description = `🎵 Nueva canción Funk original\nGroove profundo, bajos potentes y vibes clásicas.\nCreada para los verdaderos amantes del funk.\n🔥 Suscríbete para no perderte los próximos tracks\n📲 Sígueme en mis redes:\n• Instagram → https://instagram.com/musicando_funk\n• TikTok → https://tiktok.com/@musicando_funk\n• Twitter/X → https://x.com/musicando_funk\n• Spotify → https://open.spotify.com/artist/musicando\n💬 ¿Qué estilo de funk quieres escuchar después? Comenta\n#Funk #MúsicaFunk #FunkyBeats #FunkOriginal #NuevoFunk`;\n\nconst tags = \"Funk, MúsicaFunk, FunkyBeats, FunkOriginal, NuevoFunk, Funk Music, Groove, Bajos potentes, Funk latino, Música funk original\";\n\n// === HASHTAG + EMOJI ALEATORIO (se agrega después del título) ===\nconst hashtagsPool = [\n  \"#FunkIndependiente\", \"#MúsicaFunk\", \"#EnergíaFunk\",\n  \"#MotivaciónFunk\", \"#FunkVibes\", \"#GrooveIndependiente\",\n  \"#NuevaMusica\", \"#FunkEnergetico\", \"#FunkMotivador\",\n  \"#IndieFunk\", \"#MúsicaOriginal\", \"#FunkCreaciones\"\n];\nconst randomHashtag = hashtagsPool[Math.floor(Math.random() * hashtagsPool.length)];\n\nconst emojis = [\"🔥\", \"⚡\", \"💪\", \"🚀\", \"🌀\", \"🌟\", \"🎧\", \"❤️\", \"😎\", \"💥\", \"🎉\", \"🔥\"];\nconst randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];\n\n// === ACTIVACIÓN - DEVOLVER TODO ===\nreturn $input.all().map(item => {\n  return {\n    json: {\n      ...item.json,\n      description: description,\n      tags: tags,\n      \n      // Nuevo: hashtag + emoji aleatorio después del título\n      hashtags: randomHashtag,\n      emojis: randomEmoji\n    },\n    binary: item.binary\n  };\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          400,
+          -128
+        ],
+        "id": "5fe695e3-52cc-4818-8716-17e1abee991b",
+        "name": "define detalles"
+      },
+      {
+        "parameters": {
+          "operation": "download",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "options": {}
+        },
+        "id": "e731e871-1edf-4b19-acd1-f5175bce8506",
+        "name": "Descargar video",
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          560,
+          -128
+        ],
+        "executeOnce": false,
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "bPAvSDvNBNBpzbZp",
+            "name": "Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "video",
+          "operation": "upload",
+          "title": "={{ $json.Nombre.replace(/\\.[^/.]+$/, \"\") }} {{ $json.hashtags }}{{ $json.emojis }}",
+          "regionCode": "PE",
+          "categoryId": "10",
+          "options": {
+            "defaultLanguage": "es-US",
+            "description": "={{ $json.description }}",
+            "privacyStatus": "public",
+            "tags": "={{ $json.tags }}"
+          }
+        },
+        "type": "n8n-nodes-base.youTube",
+        "typeVersion": 1,
+        "position": [
+          752,
+          -128
+        ],
+        "id": "57e6d181-ade8-4dac-9e1a-e2ae504ab0ab",
+        "name": "subir video",
+        "alwaysOutputData": true,
+        "credentials": {
+          "youTubeOAuth2Api": {
+            "id": "H6Asynd3KP9HnXGl",
+            "name": "YouTube account abden"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "fileFolder",
+          "queryString": "funk-list",
+          "filter": {},
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          944,
+          -128
+        ],
+        "id": "bab3eea6-bb4d-4474-a6b1-7afd34f3cca5",
+        "name": "busca el registro",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "bPAvSDvNBNBpzbZp",
+            "name": "Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1365483959,
+            "mode": "list",
+            "cachedResultName": "data",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bH6VKt_E0L0-8IVyNOEywPtoSjOj7e5IB_KJrooDFUA/edit#gid=1365483959"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "id": "={{ $('Descargar video').item.json.id }}",
+              "Upload": "true"
+            },
+            "matchingColumns": [
+              "id"
+            ],
+            "schema": [
+              {
+                "id": "id",
+                "displayName": "id",
+                "required": false,
+                "defaultMatch": true,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Nombre",
+                "displayName": "Nombre",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Tipo",
+                "displayName": "Tipo",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Extension",
+                "displayName": "Extension",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Tamaño_bytes",
+                "displayName": "Tamaño_bytes",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Tamaño_MB",
+                "displayName": "Tamaño_MB",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Creado",
+                "displayName": "Creado",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Modificado",
+                "displayName": "Modificado",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Ultima_Actualizacion",
+                "displayName": "Ultima_Actualizacion",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Today_Create",
+                "displayName": "Today_Create",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Upload",
+                "displayName": "Upload",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "id": "059c41f0-de66-41ec-b737-ad3f60eeeb8d",
+        "name": "actualiza el registro",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          1136,
+          -128
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "TPObVut2WDyKHixN",
+            "name": "Google Sheets account"
+          }
+        },
+        "notes": "Estado intermedio: si algo se corta después de esto, ves visualmente en el Sheet qué video quedó a medias."
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "ab80e6fe-32ab-40c7-ae00-27bcc73121d3",
+                "leftValue": true,
+                "rightValue": "={{ $json.Upload }}",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          208,
+          80
+        ],
+        "id": "4324d3aa-2a4a-4c19-b409-10c156021a62",
+        "name": "If1"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1OP83cGEU-s5FDGA4RnHz-peq-2yU9k2YGigm0atA0I4",
+            "mode": "list",
+            "cachedResultName": "rock-list",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OP83cGEU-s5FDGA4RnHz-peq-2yU9k2YGigm0atA0I4/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1437928794,
+            "mode": "list",
+            "cachedResultName": "data",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OP83cGEU-s5FDGA4RnHz-peq-2yU9k2YGigm0atA0I4/edit#gid=1437928794"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          32,
+          80
+        ],
+        "id": "84d7dd9b-5e9a-4d2e-8dcf-272cbd7c75d0",
+        "name": "obtener registros1",
+        "executeOnce": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "TPObVut2WDyKHixN",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {}
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -160,
+          80
+        ],
+        "id": "fa4683e4-9bb3-4d69-ae84-bc3d636893d2",
+        "name": "Schedule Trigger1"
+      },
+      {
+        "parameters": {
+          "jsCode": "// JS PARA ROCK\nconst description = `🎸 Nueva canción Rock original\nGroove potente, guitarras eléctricas y riffs épicos.\nCreada para los verdaderos amantes del rock clásico.\n🔥 Suscríbete para no perderte los próximos tracks\n📲 Sígueme en mis redes:\n• Instagram → https://instagram.com/musicando_rock\n• TikTok → https://tiktok.com/@musicando_rock\n• Twitter/X → https://x.com/musicando_rock\n• Spotify → https://open.spotify.com/artist/musicando\n💬 ¿Qué estilo de rock quieres escuchar después? Comenta\n#Rock #MúsicaRock #RockClásico #NuevoRock`;\n\nconst tags = \"Rock, MúsicaRock, RockClásico, NuevoRock, RockOriginal, GuitarrasEléctricas, RockEnergetico\";\n\n// === HASHTAG + EMOJI ALEATORIO ===\nconst hashtagsPool = [\n  \"#RockIndependiente\", \"#MúsicaRock\", \"#EnergíaRock\",\n  \"#MotivaciónRock\", \"#RockVibes\", \"#GrooveRock\",\n  \"#NuevaMusica\", \"#RockEnergetico\", \"#RockMotivador\",\n  \"#IndieRock\", \"#MúsicaOriginal\", \"#RockCreaciones\"\n];\nconst randomHashtag = hashtagsPool[Math.floor(Math.random() * hashtagsPool.length)];\n\nconst emojis = [\"🔥\", \"⚡\", \"💪\", \"🚀\", \"🌀\", \"🌟\", \"🎧\", \"❤️\", \"😎\", \"💥\", \"🎉\", \"🔥\"];\nconst randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];\n\n// === ACTIVACIÓN - DEVOLVER TODO ===\nreturn $input.all().map(item => {\n  return {\n    json: {\n      ...item.json,\n      description: description,\n      tags: tags,\n      hashtags: randomHashtag,\n      emojis: randomEmoji\n    },\n    binary: item.binary\n  };\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          400,
+          96
+        ],
+        "id": "d15008d9-25f9-4a43-adf8-f63d524f5827",
+        "name": "define detalles1"
+      },
+      {
+        "parameters": {
+          "operation": "download",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "options": {}
+        },
+        "id": "8a2dc39e-f50e-4c25-a4e0-158e3c19dc0f",
+        "name": "Descargar video1",
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          560,
+          96
+        ],
+        "executeOnce": false,
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "bPAvSDvNBNBpzbZp",
+            "name": "Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "video",
+          "operation": "upload",
+          "title": "={{ $json.Nombre.replace(/\\.[^/.]+$/, \"\") }} {{ $json.hashtags }}{{ $json.emojis }}",
+          "regionCode": "PE",
+          "categoryId": "10",
+          "options": {
+            "defaultLanguage": "es-US",
+            "description": "={{ $json.description }}",
+            "privacyStatus": "public",
+            "tags": "={{ $json.tags }}"
+          }
+        },
+        "type": "n8n-nodes-base.youTube",
+        "typeVersion": 1,
+        "position": [
+          752,
+          96
+        ],
+        "id": "e8b3c747-fdc3-4bc3-849f-98560a0a7d30",
+        "name": "subir video1",
+        "alwaysOutputData": true,
+        "credentials": {
+          "youTubeOAuth2Api": {
+            "id": "H6Asynd3KP9HnXGl",
+            "name": "YouTube account abden"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "fileFolder",
+          "queryString": "rock-list",
+          "filter": {},
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          944,
+          96
+        ],
+        "id": "a3ba0555-9879-494a-acc9-12f9c8d0dc4a",
+        "name": "busca el registro1",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "bPAvSDvNBNBpzbZp",
+            "name": "Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1365483959,
+            "mode": "list",
+            "cachedResultName": "data",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bH6VKt_E0L0-8IVyNOEywPtoSjOj7e5IB_KJrooDFUA/edit#gid=1365483959"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "id": "={{ $('Descargar video1').item.json.id }}",
+              "Upload": "true"
+            },
+            "matchingColumns": [
+              "id"
+            ],
+            "schema": [
+              {
+                "id": "id",
+                "displayName": "id",
+                "required": false,
+                "defaultMatch": true,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Nombre",
+                "displayName": "Nombre",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Tipo",
+                "displayName": "Tipo",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Extension",
+                "displayName": "Extension",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Tamaño_bytes",
+                "displayName": "Tamaño_bytes",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Tamaño_MB",
+                "displayName": "Tamaño_MB",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Creado",
+                "displayName": "Creado",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Modificado",
+                "displayName": "Modificado",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Ultima_Actualizacion",
+                "displayName": "Ultima_Actualizacion",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Today_Create",
+                "displayName": "Today_Create",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Upload",
+                "displayName": "Upload",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "id": "ba76d250-dff7-4506-92b1-3e71fb1ff2d2",
+        "name": "actualiza el registro1",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          1136,
+          96
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "TPObVut2WDyKHixN",
+            "name": "Google Sheets account"
+          }
+        },
+        "notes": "Estado intermedio: si algo se corta después de esto, ves visualmente en el Sheet qué video quedó a medias."
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "ab80e6fe-32ab-40c7-ae00-27bcc73121d3",
+                "leftValue": true,
+                "rightValue": "={{ $json.Upload }}",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          208,
+          304
+        ],
+        "id": "1f5701c9-7977-4398-8a75-0550ce42fc2e",
+        "name": "If2"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1LVoTT8cbfKrJQ5fJTwntXvCWqCR8ujgQDsl7d4U0R8o",
+            "mode": "list",
+            "cachedResultName": "instrumental-list",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LVoTT8cbfKrJQ5fJTwntXvCWqCR8ujgQDsl7d4U0R8o/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 701214241,
+            "mode": "list",
+            "cachedResultName": "data",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LVoTT8cbfKrJQ5fJTwntXvCWqCR8ujgQDsl7d4U0R8o/edit#gid=701214241"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          32,
+          304
+        ],
+        "id": "42c6fce9-368c-467b-a539-282c31b36af7",
+        "name": "obtener registros2",
+        "executeOnce": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "TPObVut2WDyKHixN",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {}
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -160,
+          304
+        ],
+        "id": "c5907421-0dd3-41a7-8f8a-cf033e2c5b06",
+        "name": "Schedule Trigger2"
+      },
+      {
+        "parameters": {
+          "jsCode": "// JS PARA INSTRUMENTAL\nconst description = `🎹 Nueva canción Instrumental original\nSonidos puros, ritmos atmosféricos y melodías sin voz.\nCreada para los verdaderos amantes de la música instrumental.\n🔥 Suscríbete para no perderte los próximos tracks\n📲 Sígueme en mis redes:\n• Instagram → https://instagram.com/musicando_instrumental\n• TikTok → https://tiktok.com/@musicando_instrumental\n• Twitter/X → https://x.com/musicando_instrumental\n• Spotify → https://open.spotify.com/artist/musicando\n💬 ¿Qué estilo instrumental quieres escuchar después? Comenta\n#Instrumental #MúsicaInstrumental #SinVoz #NuevoInstrumental`;\n\nconst tags = \"Instrumental, MúsicaInstrumental, SinVoz, NuevoInstrumental, SonidosPuros, RitmosAtmosféricos, MúsicaSinVoz, NuevoInstrumental\";\n\n// === HASHTAG + EMOJI ALEATORIO ===\nconst hashtagsPool = [\n  \"#InstrumentalIndependiente\", \"#MúsicaInstrumental\", \"#EnergíaInstrumental\",\n  \"#MotivaciónInstrumental\", \"#InstrumentalVibes\", \"#GrooveInstrumental\",\n  \"#NuevaMusica\", \"#InstrumentalEnergetico\", \"#InstrumentalMotivador\",\n  \"#IndieInstrumental\", \"#MúsicaOriginal\", \"#InstrumentalCreaciones\"\n];\nconst randomHashtag = hashtagsPool[Math.floor(Math.random() * hashtagsPool.length)];\n\nconst emojis = [\"🔥\", \"⚡\", \"💪\", \"🚀\", \"🌀\", \"🌟\", \"🎧\", \"❤️\", \"😎\", \"💥\", \"🎉\", \"🔥\"];\nconst randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];\n\n// === ACTIVACIÓN - DEVOLVER TODO ===\nreturn $input.all().map(item => {\n  return {\n    json: {\n      ...item.json,\n      description: description,\n      tags: tags,\n      hashtags: randomHashtag,\n      emojis: randomEmoji\n    },\n    binary: item.binary\n  };\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          400,
+          320
+        ],
+        "id": "238796ae-4bb0-40e8-a6c9-7271516ae4aa",
+        "name": "define detalles2"
+      },
+      {
+        "parameters": {
+          "operation": "download",
+          "fileId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "options": {}
+        },
+        "id": "e66f4962-960c-4bb7-b945-90800ec51bfa",
+        "name": "Descargar video2",
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          560,
+          320
+        ],
+        "executeOnce": false,
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "bPAvSDvNBNBpzbZp",
+            "name": "Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "video",
+          "operation": "upload",
+          "title": "={{ $json.Nombre.replace(/\\.[^/.]+$/, \"\") }} {{ $json.hashtags }}{{ $json.emojis }}",
+          "regionCode": "PE",
+          "categoryId": "10",
+          "options": {
+            "defaultLanguage": "es-US",
+            "description": "={{ $json.description }}",
+            "privacyStatus": "public",
+            "tags": "={{ $json.tags }}"
+          }
+        },
+        "type": "n8n-nodes-base.youTube",
+        "typeVersion": 1,
+        "position": [
+          752,
+          320
+        ],
+        "id": "23010e7b-b7eb-4244-a9be-920727da30ab",
+        "name": "subir video2",
+        "alwaysOutputData": true,
+        "credentials": {
+          "youTubeOAuth2Api": {
+            "id": "H6Asynd3KP9HnXGl",
+            "name": "YouTube account abden"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "fileFolder",
+          "queryString": "instrumental-list",
+          "filter": {},
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          944,
+          320
+        ],
+        "id": "301c8341-520d-4b9f-a0a4-13f7a35401bd",
+        "name": "busca el registro2",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "bPAvSDvNBNBpzbZp",
+            "name": "Google Drive account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1365483959,
+            "mode": "list",
+            "cachedResultName": "data",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bH6VKt_E0L0-8IVyNOEywPtoSjOj7e5IB_KJrooDFUA/edit#gid=1365483959"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "id": "={{ $('Descargar video2').item.json.id }}",
+              "Upload": "true"
+            },
+            "matchingColumns": [
+              "id"
+            ],
+            "schema": [
+              {
+                "id": "id",
+                "displayName": "id",
+                "required": false,
+                "defaultMatch": true,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Nombre",
+                "displayName": "Nombre",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Tipo",
+                "displayName": "Tipo",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Extension",
+                "displayName": "Extension",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Tamaño_bytes",
+                "displayName": "Tamaño_bytes",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Tamaño_MB",
+                "displayName": "Tamaño_MB",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Creado",
+                "displayName": "Creado",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Modificado",
+                "displayName": "Modificado",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Ultima_Actualizacion",
+                "displayName": "Ultima_Actualizacion",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Today_Create",
+                "displayName": "Today_Create",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Upload",
+                "displayName": "Upload",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "id": "0a7882d3-3355-49e2-8d3d-67c4bbc1bda0",
+        "name": "actualiza el registro2",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          1136,
+          320
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "TPObVut2WDyKHixN",
+            "name": "Google Sheets account"
+          }
+        },
+        "notes": "Estado intermedio: si algo se corta después de esto, ves visualmente en el Sheet qué video quedó a medias."
+      }
+    ],
+    "connections": {
+      "If": {
+        "main": [
+          [],
+          [
+            {
+              "node": "define detalles",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "obtener registros": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "obtener registros",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "define detalles": {
+        "main": [
+          [
+            {
+              "node": "Descargar video",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Descargar video": {
+        "main": [
+          [
+            {
+              "node": "subir video",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "subir video": {
+        "main": [
+          [
+            {
+              "node": "busca el registro",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "busca el registro": {
+        "main": [
+          [
+            {
+              "node": "actualiza el registro",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If1": {
+        "main": [
+          [],
+          [
+            {
+              "node": "define detalles1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "obtener registros1": {
+        "main": [
+          [
+            {
+              "node": "If1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger1": {
+        "main": [
+          [
+            {
+              "node": "obtener registros1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "define detalles1": {
+        "main": [
+          [
+            {
+              "node": "Descargar video1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Descargar video1": {
+        "main": [
+          [
+            {
+              "node": "subir video1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "subir video1": {
+        "main": [
+          [
+            {
+              "node": "busca el registro1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "busca el registro1": {
+        "main": [
+          [
+            {
+              "node": "actualiza el registro1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If2": {
+        "main": [
+          [],
+          [
+            {
+              "node": "define detalles2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "obtener registros2": {
+        "main": [
+          [
+            {
+              "node": "If2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger2": {
+        "main": [
+          [
+            {
+              "node": "obtener registros2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "define detalles2": {
+        "main": [
+          [
+            {
+              "node": "Descargar video2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Descargar video2": {
+        "main": [
+          [
+            {
+              "node": "subir video2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "subir video2": {
+        "main": [
+          [
+            {
+              "node": "busca el registro2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "busca el registro2": {
+        "main": [
+          [
+            {
+              "node": "actualiza el registro2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "jon lest",
+    "name": "Version 2cfd7c38",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
