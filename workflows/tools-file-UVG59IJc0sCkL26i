@@ -1,0 +1,371 @@
+{
+  "updatedAt": "2026-08-10T23:58:52.951Z",
+  "createdAt": "2026-08-06T13:28:54.314Z",
+  "id": "UVG59IJc0sCkL26i",
+  "name": "tools-file",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "music-media",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "root",
+          "mode": "list",
+          "cachedResultName": "/ (Root folder)",
+          "cachedResultUrl": "https://drive.google.com/drive"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -304,
+        320
+      ],
+      "id": "4fc3dd4b-a14b-4e47-9dfc-a4cc1d5e8752",
+      "name": "music media",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bPAvSDvNBNBpzbZp",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Genera 3 items listos para crear las subcarpetas de género\n// Asume que el item de entrada tiene el ID de la carpeta padre \"media\" en $json.id\n// Si no hay input, usa un valor fijo o déjalo vacío (el nodo Drive lo pedirá)\n\nconst parentId = $input.first()?.json?.id || $input.first()?.json?.folderId || '';\n\nconst folders = ['FunkVibes', 'funk city', 'musicando'];\n\nreturn folders.map(name => ({\n  json: {\n    name: name,\n    parentId: parentId,          // ID de la carpeta \"media\"\n    // Campos extra por si los necesitas después\n    genero: name,\n    createdBy: 'n8n-setup'\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        320
+      ],
+      "id": "8806d351-f5ff-453a-a3d4-28526706ce46",
+      "name": "prepara subjeneros"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $json.name }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('music media').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        16,
+        320
+      ],
+      "id": "71633ee6-dc90-4741-942e-c5e11eae6510",
+      "name": "crear los subjeneros",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bPAvSDvNBNBpzbZp",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const genreFolder = $input.first().json;\n\nreturn [\n  {\n    json: {\n      name: 'Pending',\n      parentId: genreFolder.id,\n      genre: genreFolder.name,\n      createdBy: 'n8n-setup'\n    }\n  },\n  {\n    json: {\n      name: 'Uploaded',\n      parentId: genreFolder.id,\n      genre: genreFolder.name,\n      createdBy: 'n8n-setup'\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        528
+      ],
+      "id": "ee1969bb-7da1-4917-8d46-7335620f380b",
+      "name": "prepara p & s",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $json.name }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.parentId }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        528,
+        528
+      ],
+      "id": "d4b3ddb6-ee1d-4888-8afe-b2b61206f9e7",
+      "name": "crea pendiente y subido",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bPAvSDvNBNBpzbZp",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Tomamos la información del género actual desde el Loop\nconst currentGenre = $('Loop Over Items').item.json;\n\nreturn [\n  {\n    json: {\n      name: `${currentGenre.name}-list`,\n      parentId: currentGenre.id,\n      genre: currentGenre.name,\n      createdBy: 'n8n-setup'\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        528
+      ],
+      "id": "a8073516-e575-4913-8a12-48e1d5e3b87f",
+      "name": "prepara nombres sheet"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "={{ $json.name }}",
+        "sheetsUi": {
+          "sheetValues": [
+            {
+              "title": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        976,
+        528
+      ],
+      "id": "e9ed5fc2-98d5-4332-bb90-4c17683ac316",
+      "name": "crea los archivos sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TPObVut2WDyKHixN",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Loop Over Items').item.json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1216,
+        528
+      ],
+      "id": "275a81b2-9343-4f9c-965b-728a50ba97f1",
+      "name": "mueve los archivos",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bPAvSDvNBNBpzbZp",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        208,
+        320
+      ],
+      "id": "8f6b16bb-ff16-4a20-a1d6-6c2070456cc7",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        320
+      ],
+      "id": "285b7c15-89ba-404a-af8f-5fb8dd50c5f0",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "connections": {
+    "music media": {
+      "main": [
+        [
+          {
+            "node": "prepara subjeneros",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara subjeneros": {
+      "main": [
+        [
+          {
+            "node": "crear los subjeneros",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "crear los subjeneros": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara p & s": {
+      "main": [
+        [
+          {
+            "node": "crea pendiente y subido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "crea pendiente y subido": {
+      "main": [
+        [
+          {
+            "node": "prepara nombres sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepara nombres sheet": {
+      "main": [
+        [
+          {
+            "node": "crea los archivos sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "crea los archivos sheet": {
+      "main": [
+        [
+          {
+            "node": "mueve los archivos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mueve los archivos": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "prepara p & s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "music media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "3f7dae32-c072-4177-b90d-8d7efdc98d29",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-08-06T13:28:54.314Z",
+      "createdAt": "2026-08-06T13:28:54.314Z",
+      "role": "workflow:owner",
+      "workflowId": "UVG59IJc0sCkL26i",
+      "projectId": "zaQNXN7Imke7KSJ4"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
