@@ -1,0 +1,378 @@
+{
+  "updatedAt": "2026-09-21T19:35:30.881Z",
+  "createdAt": "2026-09-21T19:35:30.881Z",
+  "id": "HDMTCTc9VpuT5DFu",
+  "name": "Bot Trading Algorítmico - BTCUSDT",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "06e64a2c-4cb2-434b-82e4-81ee3c6dd5e4",
+      "name": "Schedule Trigger (cada 5 min)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1168,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.binance.com/api/v3/klines",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "symbol",
+              "value": "={{ $env.TRADING_SYMBOL || 'BTCUSDT' }}"
+            },
+            {
+              "name": "interval",
+              "value": "5m"
+            },
+            {
+              "name": "limit",
+              "value": "50"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "55cd6ff7-023f-4cea-b37f-f4aba0f3d722",
+      "name": "Obtener Klines Binance",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -928,
+        160
+      ],
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// ESTRATEGIA: Cruce de Medias Móviles Simples (SMA 7 vs SMA 21)\n// ============================================================\n// Entrada: array de klines de Binance\n// Formato kline: [openTime, open, high, low, close, volume, closeTime, ...]\n// ============================================================\n\ntry {\n  const items = $input.all();\n\n  // 1) Validar que tenemos datos\n  if (!items || items.length === 0) {\n    throw new Error('No se recibieron datos desde Binance');\n  }\n\n  // 2) Extraer el array de klines (el primer item contiene el array completo)\n  let klines = items[0].json;\n  if (!Array.isArray(klines)) {\n    // A veces viene envuelto en { data: [...] }\n    klines = klines.data || klines.body || klines;\n  }\n  if (!Array.isArray(klines) || klines.length < 21) {\n    throw new Error(`Datos insuficientes: ${klines ? klines.length : 0} velas`);\n  }\n\n  // 3) Convertir precios de cierre a número\n  const closes = klines.map(k => parseFloat(k[4]));\n  const precioActual = closes[closes.length - 1];\n\n  // 4) Función SMA\n  const sma = (arr, period) => {\n    if (arr.length < period) return null;\n    const slice = arr.slice(-period);\n    return slice.reduce((a, b) => a + b, 0) / period;\n  };\n\n  // 5) Calcular medias: actuales y previas (para detectar cruce)\n  const smaCortaActual = sma(closes, 7);\n  const smaLargaActual = sma(closes, 21);\n  const smaCortaPrev   = sma(closes.slice(0, -1), 7);\n  const smaLargaPrev   = sma(closes.slice(0, -1), 21);\n\n  // 6) Determinar señal por cruce\n  let señal = 'NEUTRO';\n  if (smaCortaPrev !== null && smaLargaPrev !== null) {\n    const cruceAlcista = smaCortaPrev <= smaLargaPrev && smaCortaActual > smaLargaActual;\n    const cruceBajista = smaCortaPrev >= smaLargaPrev && smaCortaActual < smaLargaActual;\n\n    if (cruceAlcista) señal = 'COMPRA';\n    else if (cruceBajista) señal = 'VENTA';\n  }\n\n  // 7) Devolver objeto limpio\n  return [{\n    json: {\n      activo: $env.TRADING_SYMBOL || 'BTCUSDT',\n      precioActual: Number(precioActual.toFixed(2)),\n      señal: señal,\n      smaCorta: Number(smaCortaActual.toFixed(2)),\n      smaLarga: Number(smaLargaActual.toFixed(2)),\n      timestamp: new Date().toISOString()\n    }\n  }];\n\n} catch (error) {\n  // En caso de error, devolvemos una señal NEUTRA con el error embebido\n  // para que el flujo continúe y el Error Trigger pueda alertar si se desea.\n  return [{\n    json: {\n      activo: $env.TRADING_SYMBOL || 'BTCUSDT',\n      precioActual: 0,\n      señal: 'NEUTRO',\n      error: error.message,\n      timestamp: new Date().toISOString()\n    }\n  }];\n}\n"
+      },
+      "id": "841bcad0-ea12-43cf-8f94-39a777c3ae14",
+      "name": "Estrategia SMA 7/21",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -688,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-1",
+              "leftValue": "={{ $json.señal }}",
+              "rightValue": "NEUTRO",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "cond-2",
+              "leftValue": "={{ $json.precioActual }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "37b3917c-2cfe-4a84-9e26-8cc9c4828ea9",
+      "name": "¿Señal != NEUTRO?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -448,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "=<b>🚨 SEÑAL DE TRADING</b>\n\n<b>Activo:</b> {{ $json.activo }}\n<b>Señal:</b> <code>{{ $json.señal }}</code>\n<b>Precio:</b> ${{ $json.precioActual }}\n<b>SMA7:</b> {{ $json.smaCorta }} | <b>SMA21:</b> {{ $json.smaLarga }}\n<b>Hora:</b> {{ $json.timestamp }}\n\n<i>Estrategia: Cruce SMA 7/21 · Temporalidad 5m</i>",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "f73ec496-149e-44c3-9a44-d5f8ebbb8ece",
+      "name": "Notificar Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -192,
+        16
+      ],
+      "webhookId": "492cad97-0dc8-4b13-956c-42cf6cd903e6",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Trades",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha": "={{ $json.timestamp }}",
+            "Activo": "={{ $json.activo }}",
+            "Precio": "={{ $json.precioActual }}",
+            "Señal": "={{ $json.señal }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "type": "string"
+            },
+            {
+              "id": "Activo",
+              "displayName": "Activo",
+              "type": "string"
+            },
+            {
+              "id": "Precio",
+              "displayName": "Precio",
+              "type": "number"
+            },
+            {
+              "id": "Señal",
+              "displayName": "Señal",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7212f647-dae7-4f90-8c5f-f20b17d2e105",
+      "name": "Registrar en Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -192,
+        160
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.broker-ejemplo.com/api/v3/order",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-MBX-APIKEY",
+              "value": "={{ $env.BROKER_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"symbol\": \"{{ $json.activo }}\",\n  \"side\": \"{{ $json.señal === 'COMPRA' ? 'BUY' : 'SELL' }}\",\n  \"type\": \"MARKET\",\n  \"quantity\": {{ $env.TRADE_QUANTITY || 0.001 }},\n  \"timestamp\": {{ Date.now() }},\n  \"recvWindow\": 5000\n}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "id": "2298d46d-a78a-42cd-9086-9ced5105a151",
+      "name": "Ejecutar Orden (Placeholder)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -192,
+        304
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "PLACEHOLDER: reemplazar URL y credenciales por las del bróker real (Binance, Alpaca, etc.)"
+    },
+    {
+      "parameters": {},
+      "id": "6955646c-7bc4-4b6a-8def-63a97a62e967",
+      "name": "Fin (NEUTRO)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "=⚠️ <b>ERROR EN BOT DE TRADING</b>\n\n<b>Workflow:</b> {{ $workflow.name }}\n<b>Nodo:</b> {{ $node.name }}\n<b>Error:</b> {{ $json.error?.message || $json.error || 'Desconocido' }}\n<b>Hora:</b> {{ new Date().toISOString() }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "dddbe225-b4b3-4b8b-b7c7-4a96f55ee380",
+      "name": "Alerta Error Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -688,
+        416
+      ],
+      "webhookId": "7767cf95-7930-4272-981c-47ebd68d45bc",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "eb2ce785-42aa-4845-bb5f-ffa1e8402e40",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -928,
+        416
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger (cada 5 min)": {
+      "main": [
+        [
+          {
+            "node": "Obtener Klines Binance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Klines Binance": {
+      "main": [
+        [
+          {
+            "node": "Estrategia SMA 7/21",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estrategia SMA 7/21": {
+      "main": [
+        [
+          {
+            "node": "¿Señal != NEUTRO?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Señal != NEUTRO?": {
+      "main": [
+        [
+          {
+            "node": "Notificar Telegram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Registrar en Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Ejecutar Orden (Placeholder)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fin (NEUTRO)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Alerta Error Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "8c30083e-69ad-4daa-b822-53e07fcce242",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-09-21T19:35:30.881Z",
+      "createdAt": "2026-09-21T19:35:30.881Z",
+      "role": "workflow:owner",
+      "workflowId": "HDMTCTc9VpuT5DFu",
+      "projectId": "zaQNXN7Imke7KSJ4"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
